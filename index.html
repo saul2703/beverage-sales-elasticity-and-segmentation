@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Data Engineering &amp; Applied Analytics Portfolio — Streaming retail inventory rollups, multi-source store prioritization pipelines, and automated OOS detection.">
+  <title>Saul Avalos | Data Engineering &amp; Applied Analytics Portfolio</title>
+  <style>
+    @layer base, theme, components, utilities;
+
+    @layer theme {
+      :root {
+        --bg-canvas-light: #f8fafc;
+        --bg-canvas-dark: #0b0f19;
+        --bg-surface-light: #ffffff;
+        --bg-surface-dark: #111827;
+        --bg-subtle-light: #f1f5f9;
+        --bg-subtle-dark: #1e293b;
+        --text-primary-light: #0f172a;
+        --text-primary-dark: #f8fafc;
+        --text-muted-light: #475569;
+        --text-muted-dark: #94a3b8;
+        --border-light: #e2e8f0;
+        --border-dark: #1e293b;
+        --brand-light: #0284c7;
+        --brand-dark: #38bdf8;
+        --brand-subtle-light: #e0f2fe;
+        --brand-subtle-dark: #0c4a6e;
+        --metric-positive-light: #047857;
+        --metric-positive-dark: #34d399;
+
+        --bg-canvas: var(--bg-canvas-light);
+        --bg-surface: var(--bg-surface-light);
+        --bg-subtle: var(--bg-subtle-light);
+        --text-primary: var(--text-primary-light);
+        --text-muted: var(--text-muted-light);
+        --border-color: var(--border-light);
+        --brand: var(--brand-light);
+        --brand-subtle: var(--brand-subtle-light);
+        --metric-positive: var(--metric-positive-light);
+
+        @media (prefers-color-scheme: dark) {
+          --bg-canvas: var(--bg-canvas-dark);
+          --bg-surface: var(--bg-surface-dark);
+          --bg-subtle: var(--bg-subtle-dark);
+          --text-primary: var(--text-primary-dark);
+          --text-muted: var(--text-muted-dark);
+          --border-color: var(--border-dark);
+          --brand: var(--brand-dark);
+          --brand-subtle: var(--brand-subtle-dark);
+          --metric-positive: var(--metric-positive-dark);
+        }
+
+        @supports (color: light-dark(white, black)) {
+          --bg-canvas: light-dark(var(--bg-canvas-light), var(--bg-canvas-dark));
+          --bg-surface: light-dark(var(--bg-surface-light), var(--bg-surface-dark));
+          --bg-subtle: light-dark(var(--bg-subtle-light), var(--bg-subtle-dark));
+          --text-primary: light-dark(var(--text-primary-light), var(--text-primary-dark));
+          --text-muted: light-dark(var(--text-muted-light), var(--text-muted-dark));
+          --border-color: light-dark(var(--border-light), var(--border-dark));
+          --brand: light-dark(var(--brand-light), var(--brand-dark));
+          --brand-subtle: light-dark(var(--brand-subtle-light), var(--brand-subtle-dark));
+          --metric-positive: light-dark(var(--metric-positive-light), var(--metric-positive-dark));
+        }
+
+        color-scheme: light dark;
+        accent-color: var(--brand);
+        --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+    }
+
+    @layer base {
+      html, body, div, header, nav, main, section, article, aside, footer,
+      h1, h2, h3, p, ul, ol, li, dl, dt, dd, figure, figcaption, pre, code,
+      details, summary, button, search {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--bg-canvas);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        line-height: 1.6;
+        padding-inline: 1.25rem;
+      }
+
+      a {
+        color: var(--brand);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.2em;
+      }
+
+      a:hover {
+        text-decoration-thickness: 2px;
+      }
+
+      code, pre {
+        font-family: var(--font-mono);
+        font-size: 0.875em;
+      }
+    }
+
+    @layer components {
+      .container {
+        max-inline-size: 64rem;
+        margin-inline: auto;
+        padding-block: 2.5rem;
+      }
+
+      .site-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding-block-end: 2rem;
+        border-block-end: 1px solid var(--border-color);
+      }
+
+      .nav-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        list-style: none;
+      }
+
+      .hero {
+        padding-block: 2.5rem;
+        border-block-end: 1px solid var(--border-color);
+      }
+
+      .status-badge {
+        display: inline-block;
+        background-color: var(--brand-subtle);
+        color: var(--brand);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        padding-block: 0.25rem;
+        padding-inline: 0.75rem;
+        border-radius: 999px;
+        margin-block-end: 1rem;
+      }
+
+      .hero h1 {
+        font-size: clamp(1.85rem, 3.5vw, 2.75rem);
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        margin-block-end: 0.75rem;
+      }
+
+      .hero-lead {
+        color: var(--text-muted);
+        font-size: 1.125rem;
+        max-inline-size: 52rem;
+        margin-block-end: 1.5rem;
+      }
+
+      .metrics-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+        gap: 1rem;
+        margin-block-start: 1.5rem;
+      }
+
+      .metric-card {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding-block: 1rem;
+        padding-inline: 1.25rem;
+      }
+
+      .metric-value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--metric-positive);
+        font-family: var(--font-mono);
+      }
+
+      .metric-label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+      }
+
+      .section-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1rem;
+        margin-block-start: 2.5rem;
+        margin-block-end: 1.5rem;
+      }
+
+      .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .filter-btn {
+        background-color: var(--bg-surface);
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+        padding-block: 0.375rem;
+        padding-inline: 0.75rem;
+        font: inherit;
+        font-size: 0.875rem;
+        cursor: pointer;
+      }
+
+      .filter-btn:hover:not(:disabled) {
+        border-color: var(--brand);
+        color: var(--text-primary);
+      }
+
+      .filter-btn[aria-pressed="true"] {
+        background-color: var(--brand-subtle);
+        border-color: var(--brand);
+        color: var(--brand);
+        font-weight: 600;
+      }
+
+      .case-grid {
+        display: grid;
+        gap: 1.75rem;
+      }
+
+      .case-card {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 0.625rem;
+        padding-block: 1.5rem;
+        padding-inline: 1.5rem;
+      }
+
+      .case-meta {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+        margin-block-end: 0.75rem;
+      }
+
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        list-style: none;
+      }
+
+      .tag {
+        background-color: var(--bg-subtle);
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        padding-block: 0.2rem;
+        padding-inline: 0.55rem;
+        border-radius: 0.25rem;
+      }
+
+      .case-card h3 {
+        font-size: 1.35rem;
+        margin-block-end: 0.5rem;
+      }
+
+      .case-summary {
+        color: var(--text-muted);
+        margin-block-end: 1rem;
+      }
+
+      .impact-list {
+        list-style: none;
+        border-inline-start: 3px solid var(--brand);
+        padding-inline-start: 1rem;
+        margin-block-end: 1.25rem;
+      }
+
+      .impact-list li:not(:last-child) {
+        margin-block-end: 0.35rem;
+      }
+
+      .code-figure {
+        margin-block: 1rem;
+      }
+
+      .code-figure figcaption {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        margin-block-end: 0.35rem;
+        font-family: var(--font-mono);
+      }
+
+      .code-figure pre {
+        color-scheme: dark;
+        accent-color: var(--brand);
+        background-color: #0f172a;
+        color: #e2e8f0;
+        padding-block: 0.875rem;
+        padding-inline: 1rem;
+        border-radius: 0.375rem;
+        overflow-x: auto;
+      }
+
+      details {
+        border-block-start: 1px solid var(--border-color);
+        padding-block-start: 0.875rem;
+        margin-block-start: 0.875rem;
+      }
+
+      summary {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5ch;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        cursor: pointer;
+        color: var(--brand);
+
+        &::before {
+          content: "";
+          inline-size: 0.9em;
+          block-size: 0.9em;
+          flex-shrink: 0;
+          background-color: currentColor;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='black' d='M3.2 5.5 8 10.3l4.8-4.8 1.2 1.2-6 6-6-6 1.2-1.2Z'/%3E%3C/svg%3E") no-repeat center / contain;
+          rotate: -90deg;
+        }
+
+        &:dir(rtl)::before {
+          rotate: 90deg;
+        }
+
+        details[open] > &::before {
+          rotate: 0deg;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+          &::before {
+            transition: rotate 0.2s;
+          }
+        }
+      }
+
+      details::details-content {
+        interpolate-size: allow-keywords;
+        overflow: clip;
+        contain: layout;
+      }
+
+      details:not([open])::details-content {
+        block-size: 0;
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        details::details-content {
+          transition: block-size, content-visibility, display;
+          transition-duration: 0.25s;
+          transition-timing-function: ease-in-out;
+          transition-behavior: allow-discrete;
+        }
+      }
+
+      .details-body {
+        padding-block-start: 0.75rem;
+        color: var(--text-muted);
+        font-size: 0.9375rem;
+      }
+
+      .site-footer {
+        margin-block-start: 3rem;
+        padding-block-start: 1.5rem;
+        border-block-start: 1px solid var(--border-color);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 1rem;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <strong>Saul Avalos // Data Engineering &amp; Retail Analytics</strong>
+      <nav aria-label="Primary navigation">
+        <ul class="nav-list">
+          <li><a href="#case-studies">Case Studies</a></li>
+          <li><a href="#stack">Core Stack</a></li>
+          <li><a href="https://github.com/saul2703">GitHub</a></li>
+          <li><a href="mailto:saulavalos27@gmail.com">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-heading">
+        <span class="status-badge">Available for Data Engineering &amp; Applied Analytics Roles</span>
+        <h1 id="hero-heading">High-throughput inventory pipelines, deterministic SKU normalization, and store prioritization engines.</h1>
+        <p class="hero-lead">
+          I build production Python and SQL data pipelines that turn messy, multi-part retail feeds into reliable, deduplicated operational decisions—prioritizing throughput, data integrity, and zero manual reconciliation.
+        </p>
+
+        <div class="metrics-strip">
+          <div class="metric-card">
+            <span class="metric-value">2x Faster</span>
+            <span class="metric-label">Streaming CSV/XLSX ingestion via 300k-row chunks &amp; column pruning</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-value">6 Sources</span>
+            <span class="metric-label">Unified into 5,000-store execution chunks with 21-day rolling joins</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-value">0 Double-Counts</span>
+            <span class="metric-label">Stem-level file dedup &amp; canonical 32-hex GUID normalization</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="case-studies" aria-labelledby="projects-heading">
+        <div class="section-header">
+          <h2 id="projects-heading">Production Engineering Case Studies</h2>
+          <search aria-label="Filter case studies by domain">
+            <div class="filter-bar">
+              <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">All (7)</button>
+              <button type="button" class="filter-btn" data-filter="stats" aria-pressed="false">Statistical Analysis &amp; ML</button>
+              <button type="button" class="filter-btn" data-filter="bi" aria-pressed="false">HTML5 Reports &amp; AG Grid</button>
+              <button type="button" class="filter-btn" data-filter="rollup" aria-pressed="false">OOS &amp; Inventory Rollups</button>
+              <button type="button" class="filter-btn" data-filter="data" aria-pressed="false">Multi-Source ETL</button>
+              <button type="button" class="filter-btn" data-filter="ml" aria-pressed="false">Prioritization &amp; Ranking</button>
+            </div>
+          </search>
+        </div>
+
+        <div class="case-grid">
+          <!-- Featured Kaggle Flagship Case Study: 8.99M-Row Beverage Sales, Elasticity & K-Means + AG Grid -->
+          <article class="case-card" data-category="stats">
+            <div class="case-meta">
+              <ul class="tag-list" aria-label="Technologies used">
+                <li class="tag">8.99M Rows (752.7 MB)</li>
+                <li class="tag">K-Means++ &amp; PCA</li>
+                <li class="tag">AG Grid Dashboard</li>
+                <li class="tag">Matplotlib / Python</li>
+              </ul>
+              <a href="demos/beverage-analytics-dashboard.html">Launch AG Grid &amp; Matplotlib Dashboard &rarr;</a>
+            </div>
+            <h3>Flagship Case Study: German Beverage Sales, Discount Elasticity &amp; K-Means Customer Segmentation ($1.18B Revenue)</h3>
+            <p class="case-summary">
+              Streamed <strong>8,999,910 transactions</strong> (<strong>3.0M orders</strong>, <strong>10,000 customers</strong> across <strong>16 German states</strong>) in 22.2 seconds to quantify promotional margin leakage, test discount tier volume elasticity, segment customers via K-Means++ clustering, and deliver a self-service <strong>AG Grid HTML5 dashboard</strong>.
+            </p>
+            <ul class="impact-list">
+              <li><strong>Promotional Margin Leakage ($96.41M):</strong> Proved that stepping B2B discounts from 10% to 15% yields only <strong>+14.8% incremental line volume</strong> (`62.05 &rarr; 71.26` units, vs. +82.9% from 5% to 10%) while leaking <strong>$28.68M</strong> in margin—identifying a <strong>$9.5M–$14.3M</strong> annual margin recovery opportunity.</li>
+              <li><strong>Category Pareto Asymmetry:</strong> Showed that while all 4 categories move ~52.0M units each, <strong>Alcoholic Beverages drive 77.5% ($911.80M) of net revenue</strong>, led by Veuve Clicquot ($202.58M) and Moët &amp; Chandon ($175.09M).</li>
+              <li><strong>Unsupervised Customer Clustering (k = 4, Silhouette = 0.5384):</strong> Segmented 10,000 customers via z-score standardized features and 2D PCA (99.55% variance explained), isolating 1,873 Growth Wholesale Accounts where closing a 27.6-order frequency gap unlocks <strong>+$43.2M</strong>.</li>
+            </ul>
+            <details>
+              <summary>View Matplotlib Charts &amp; Interactive AG Grid Dashboard</summary>
+              <div class="details-body">
+                <p>Explore the interactive <a href="demos/beverage-analytics-dashboard.html">AG Grid &amp; Matplotlib Beverage Analytics Dashboard</a> (filter 47 brands &times; 16 German states and export CSVs) or inspect the full methodology and 7 publication-grade charts in <a href="README.md">README.md</a>.</p>
+              </div>
+            </details>
+          </article>
+
+          <!-- Case Study 0: HTML5 Interactive Reports -->
+          <article class="case-card" data-category="bi">
+            <div class="case-meta">
+              <ul class="tag-list" aria-label="Technologies used">
+                <li class="tag">HTML5 / SVG</li>
+                <li class="tag">AG-Grid</li>
+                <li class="tag">Management Reporting</li>
+                <li class="tag">Zero-Backend Portable BI</li>
+              </ul>
+              <a href="demos/executive-reset-pack.html">Launch Sanitized Live Demo &rarr;</a>
+            </div>
+            <h3>1. Self-Contained HTML5 Executive Reset &amp; Weekly Project Trackers</h3>
+            <p class="case-summary">
+              Replaced static 40-tab spreadsheets with single-file, zero-server HTML5 interactive reports (<code>R2 Reset Tracker</code> &amp; <code>Weekly Project Tracker</code>) combining AG-Grid drilldowns, SVG workload/coverage charts, and inline data-quality definitions.
+            </p>
+            <ul class="impact-list">
+              <li><strong>Decision-First KPI Strip:</strong> Surfaces Active Projects, Qualified/Completed/Scheduled Visits, Coverage %, and 14-day closing/starting windows on one screen.</li>
+              <li><strong>Driver-Based Variance &amp; Governance:</strong> Embeds metric formulas and data-check tooltips directly next to every KPI so stakeholders never debate definitions.</li>
+              <li><strong>Zero-Infra Distribution:</strong> Compiles weekly CSV/Excel exports into portable HTML5 packs shareable via SharePoint or email with full client-side filtering.</li>
+            </ul>
+            <details>
+              <summary>Management Reporting Design &amp; Sanitized Demo</summary>
+              <div class="details-body">
+                <p><strong>Why HTML5 over BI licenses?</strong> Field leads and external partners needed instant filtering and drilldowns without waiting on VPNs or paid BI seats. <a href="demos/executive-reset-pack.html">Open the sanitized interactive demo</a> to test the live KPI strip, variance bridge, SVG tier chart, and filterable grid.</p>
+              </div>
+            </details>
+          </article>
+
+          <!-- Case Study 1 -->
+          <article class="case-card" data-category="rollup">
+            <div class="case-meta">
+              <ul class="tag-list" aria-label="Technologies used">
+                <li class="tag">Python</li>
+                <li class="tag">Pandas Chunking</li>
+                <li class="tag">Deterministic Rules</li>
+                <li class="tag">GUID Canonicalization</li>
+              </ul>
+              <a href="#case-studies">OOS Rollup Engine &rarr;</a>
+            </div>
+            <h3>2. Deterministic Out-of-Stock (OOS) Daily Rollup &amp; Cloud Pipeline</h3>
+            <p class="case-summary">
+              Built an automated daily inventory rollup pipeline that ingests multi-part retail inventory dumps (`.csv` and `.xlsx`), enforces deterministic SKU whitelists and partner exclusions, and flags zero-stock and low-stock (`1 &lt;= qty &lt;= 5`) call-out stores.
+            </p>
+            <ul class="impact-list">
+              <li><strong>Zero Double-Counting:</strong> Implemented file-stem deduplication preferring `.csv` over `.xlsx` when both formats land in the same SharePoint/cloud drop folder, ignoring temporary lockfiles (`~$`) and duplicate downloads (`(1)`).</li>
+              <li><strong>Deterministic SKU Filtering:</strong> Replaced brittle regex heuristics with explicit US/Canada SKU whitelists (`VALID_PSGS`) to eliminate non-card fixture and signage noise.</li>
+              <li><strong>Canonical Store Keys:</strong> Normalized heterogeneous `STORE_GUID` formats into canonical 32-hex hyphenated UUIDs and stripped trailing `.0` float artifacts from store codes.</li>
+            </ul>
+
+            <figure class="code-figure">
+              <figcaption id="code-guid-norm">Canonical STORE_GUID normalization &amp; stem deduplication (Python)</figcaption>
+              <pre role="region" aria-labelledby="code-guid-norm" tabindex="0"><code>def c_guid(v):
+    if v is None or pd.isna(v):
+        return ""
+    s = re.sub(r"\.0$", "", str(v).strip()).upper().strip("{} ")
+    if s in {"", "NAN", "NONE", "NULL"}:
+        return ""
+    hex_only = re.sub(r"[^0-9A-F]", "", s)
+    if len(hex_only) == 32 and re.fullmatch(r"[0-9A-F-]+", s):
+        return f"{hex_only[:8]}-{hex_only[8:12]}-{hex_only[12:16]}-{hex_only[16:20]}-{hex_only[20:]}"
+    return s.lstrip("0") or "0" if s.isdigit() else s</code></pre>
+            </figure>
+
+            <details>
+              <summary>Architecture, Tradeoffs &amp; Edge Cases Solved</summary>
+              <div class="details-body">
+                <p><strong>Encoding &amp; Speed Fix:</strong> Raw retail exports contained `0xc9` (`É`) bytes that crashed default UTF-8 readers. Switching to `encoding="latin1"` with `usecols` projection cut memory usage and doubled ingestion speed.</p>
+                <p><strong>Low-Stock Secondary Visibility:</strong> Separated hard OOS (`ON_HAND_QTY == 0`) from low-stock (`1 &lt;= ON_HAND_QTY &lt;= 5`) so field teams can prioritize true stockouts before replenishment windows.</p>
+              </div>
+            </details>
+          </article>
+
+          <!-- Case Study 2 -->
+          <article class="case-card" data-category="data">
+            <div class="case-meta">
+              <ul class="tag-list" aria-label="Technologies used">
+                <li class="tag">Python</li>
+                <li class="tag">300k-Row Streaming</li>
+                <li class="tag">OpenPyXL</li>
+                <li class="tag">Schema Projection</li>
+              </ul>
+              <a href="#case-studies">Streaming Ingestion &rarr;</a>
+            </div>
+            <h3>3. High-Throughput Streaming Inventory Query &amp; Workbook Exporter</h3>
+            <p class="case-summary">
+              Engineered a memory-bounded ingestion layer to aggregate multi-hundred-thousand-row partner inventory files into store-level summaries (`ON_HAND_QTY`, `ON_ORDER_QTY`, `IN_TRANSIT_QTY`) with conditional partner/brand filtering.
+            </p>
+            <ul class="impact-list">
+              <li><strong>2x Faster Reads:</strong> Streamed CSVs in `300,000`-row chunks with `usecols` column pruning and vectorized `pd.to_numeric(..., errors="coerce")` coercion.</li>
+              <li><strong>Partner-Specific Rules:</strong> Applied conditional brand filtering per `PARTNER_CD` while preserving full-catalog aggregation for all other retail partners.</li>
+              <li><strong>Deliverable Guardrails:</strong> Automated workbook size assertions (`&lt; 50 MB`) so downstream Excel/SharePoint consumers never hit attachment or browser limits.</li>
+            </ul>
+
+            <figure class="code-figure">
+              <figcaption id="code-stream-chunk">Memory-bounded CSV/XLSX streaming with column projection (Python)</figcaption>
+              <pre role="region" aria-labelledby="code-stream-chunk" tabindex="0"><code>if p.suffix.lower() == ".csv":
+    parts = pd.read_csv(
+        p, dtype=str, encoding="latin1",
+        usecols=lambda c: c.strip().upper() in cols,
+        chunksize=300_000,
+    )
+else:
+    parts = pd.read_excel(
+        p, sheet_name=None, dtype=str,
+        usecols=lambda c: str(c).strip().upper() in cols,
+    ).values()</code></pre>
+            </figure>
+
+            <details>
+              <summary>Architecture, Tradeoffs &amp; Edge Cases Solved</summary>
+              <div class="details-body">
+                <p><strong>Why flat streaming dictionaries over full DataFrame concats?</strong> Concatenating raw multi-million-row string frames spiked RAM and slowed groupby joins. Aggregating directly into a `STORE_GUID`-keyed dictionary during chunk iteration kept memory flat.</p>
+                <p><strong>Resilient File Discovery:</strong> Automatically selects the newest date-stamped batch (`newest(folder, pattern)`) while excluding Office lockfiles (`~$`).</p>
+              </div>
+            </details>
+          </article>
+
+          <!-- Case Study 3 -->
+          <article class="case-card" data-category="ml">
+            <div class="case-meta">
+              <ul class="tag-list" aria-label="Technologies used">
+                <li class="tag">Python</li>
+                <li class="tag">Quartile Ranking</li>
+                <li class="tag">21-Day Rolling Joins</li>
+                <li class="tag">HTML5 Dashboards</li>
+              </ul>
+              <a href="#case-studies">Prioritization Engine &rarr;</a>
+            </div>
+            <h3>4. Unified 6-Source Store Escalation &amp; Quartile Prioritization Engine</h3>
+            <p class="case-summary">
+              Joined 6 operational workbooks—On-Hand Inventory, DSD Sales, Units Data, 21-day rolling field tracking (`REPORT_DATE - 21 days`), Master Store Escalation Engine, and Yearly Tier Calendar—into 5,000-store execution chunks ranked by joint sales/units quartiles.
+            </p>
+            <ul class="impact-list">
+              <li><strong>Multi-Source Reconciliation:</strong> Harmonized 6 heterogeneous schemas with explicit pre-flight file validation and missing-store fallback states (`Unavailable - store not in MSL`).</li>
+              <li><strong>Quartile Impact Scoring:</strong> Combined dollar sales and unit velocity into joint quartile ranks (`Joint_Store_Sales_Units_Quartile_Rank`) so field reps visit highest-ROI out-of-stock stores first.</li>
+              <li><strong>Execution-Ready Output:</strong> Partitioned prioritized stores into `5,000`-row chunks alongside linked HTML5 reset/project trackers for immediate field deployment.</li>
+            </ul>
+
+            <details>
+              <summary>Architecture, Tradeoffs &amp; Edge Cases Solved</summary>
+              <div class="details-body">
+                <p><strong>Pre-Flight Fail-Fast Validation:</strong> Verifies all 6 required upstream inputs exist before starting heavy Excel parsing, surfacing exact missing paths immediately rather than failing mid-pipeline.</p>
+                <p><strong>Rolling Window Alignment:</strong> Anchors field tracking joins to a deterministic `REPORT_DATE - 21 days` lookback window so weekly OOS snapshots stay synchronized with recent store visit history.</p>
+              </div>
+            </details>
+          </article>
+
+          <!-- Case Study 5: Statistical Analysis (Quartile Ranking) -->
+          <article class="case-card" data-category="stats">
+            <div class="case-meta">
+              <ul class="tag-list" aria-label="Technologies used">
+                <li class="tag">Non-Parametric Stats</li>
+                <li class="tag">Quartile Segmentation</li>
+                <li class="tag">Skewed Distributions</li>
+                <li class="tag">Python / Pandas</li>
+              </ul>
+              <a href="#case-studies">Statistical Ranking &rarr;</a>
+            </div>
+            <h3>5. Bivariate Store Sales &amp; Units Quartile Ranking (Skew-Resistant Segmentation)</h3>
+            <p class="case-summary">
+              Designed a joint percentile and quartile ranking model (<code>Joint_Store_Sales_Units_Quartile_Rank</code>) to segment thousands of retail locations by both dollar volume and unit velocity without distortion from extreme flagship outliers.
+            </p>
+            <ul class="impact-list">
+              <li><strong>Robustness to Heavy Tails:</strong> Retail store sales follow a right-skewed power law; rank-based quartiles prevented top 2% mega-stores from compressing 90% of locations into a single "low" bucket.</li>
+              <li><strong>Bivariate Tie-Breaking:</strong> Combined normalized percentile ranks across revenue and unit counts so high-velocity, lower-ticket locations still surface for stockout intervention.</li>
+            </ul>
+
+            <figure class="code-figure">
+              <figcaption id="code-quartile-stats">Composite percentile &amp; quartile scoring (Python / Pandas)</figcaption>
+              <pre role="region" aria-labelledby="code-quartile-stats" tabindex="0"><code>df["sales_pct"] = df["sales_usd"].rank(pct=True, method="average")
+df["units_pct"] = df["units_sold"].rank(pct=True, method="average")
+df["joint_score"] = 0.5 * df["sales_pct"] + 0.5 * df["units_pct"]
+df["quartile_rank"] = pd.qcut(
+    df["joint_score"], q=4, labels=["Q4 (Bottom)", "Q3", "Q2", "Q1 (Top)"]
+)</code></pre>
+            </figure>
+
+            <details>
+              <summary>Statistical Rationale &amp; Tradeoffs</summary>
+              <div class="details-body">
+                <p><strong>Why percentile ranks over z-scores?</strong> Z-scores assume approximate normality and are sensitive to extreme store outliers; rank-based percentiles preserve monotonic ordering and guarantee balanced operational tiers for field capacity planning.</p>
+              </div>
+            </details>
+          </article>
+
+          <!-- Case Study 6: Statistical Calibration & ROI -->
+          <article class="case-card" data-category="stats">
+            <div class="case-meta">
+              <ul class="tag-list" aria-label="Technologies used">
+                <li class="tag">Baseline Calibration</li>
+                <li class="tag">Lift &amp; ROI Attribution</li>
+                <li class="tag">Pre/Post Analysis</li>
+                <li class="tag">Variance Decomposition</li>
+              </ul>
+              <a href="#case-studies">Calibration &amp; ROI &rarr;</a>
+            </div>
+            <h3>6. Retail Partner Calibration Model &amp; Incremental ROI Attribution</h3>
+            <p class="case-summary">
+              Built a store-level calibration and pre/post lift framework to measure the true incremental impact of merchandising resets—controlling for baseline seasonality, store-tier mix, and out-of-stock duration.
+            </p>
+            <ul class="impact-list">
+              <li><strong>Matched-Cohort Baselines:</strong> Compared treated reset stores against matched non-reset control cohorts within the same volume quartile and region to isolate merchandising lift from macro seasonality.</li>
+              <li><strong>Variance Decomposition:</strong> Separated observed revenue deltas into timing/phasing effects vs. permanent velocity gains so leadership only scales programs with durable positive ROI.</li>
+            </ul>
+
+            <details>
+              <summary>Statistical Rationale &amp; Tradeoffs</summary>
+              <div class="details-body">
+                <p><strong>Preventing Selection Bias:</strong> Field teams naturally visit higher-performing stores first; stratifying calibration by pre-period quartile rank prevents overstating program ROI by attributing baseline store strength to the intervention.</p>
+              </div>
+            </details>
+          </article>
+        </div>
+      </section>
+
+      <section id="stack" aria-labelledby="stack-heading">
+        <div class="section-header">
+          <h2 id="stack-heading">Core Technical Capabilities</h2>
+        </div>
+        <div class="metrics-strip">
+          <div class="metric-card">
+            <strong>Python Data Engineering</strong>
+            <p class="metric-label">Pandas, NumPy, OpenPyXL, chunked streaming ETL, regex/GUID normalization, automated file validation.</p>
+          </div>
+          <div class="metric-card">
+            <strong>SQL &amp; Analytics Modeling</strong>
+            <p class="metric-label">Window functions, deduplication, dimensional joins, quartile ranking, rolling time-window cohorts.</p>
+          </div>
+          <div class="metric-card">
+            <strong>Operational Reporting &amp; BI</strong>
+            <p class="metric-label">Automated Excel/CSV pipelines, SharePoint/cloud ingestion, self-contained HTML5 operational trackers.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Built with zero external JS dependencies &bull; Fast, accessible, and verifiable.</span>
+      <span><a href="README.md">View Repository README</a></span>
+    </footer>
+  </div>
+
+  <script>
+    document.querySelector(".filter-bar")?.addEventListener("click", event => {
+      const btn = event.target.closest("button[data-filter]");
+      if (!btn) return;
+      const filter = btn.dataset.filter;
+
+      for (const b of btn.parentElement.querySelectorAll("button[data-filter]")) {
+        b.setAttribute("aria-pressed", String(b === btn));
+      }
+      for (const card of document.querySelectorAll(".case-card[data-category]")) {
+        card.hidden = filter !== "all" && card.dataset.category !== filter;
+      }
+    });
+  </script>
+</body>
+</html>

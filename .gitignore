@@ -1,0 +1,10 @@
+# Private drafts, resumes, and interview notes (never committed)
+private-notes/
+*.pdf
+*.docx
+.env
+.DS_Store
+Thumbs.db
+
+# Exclude >100 MB raw Kaggle CSVs from git commits
+*.csv
