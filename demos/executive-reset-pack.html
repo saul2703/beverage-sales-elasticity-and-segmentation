@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Sanitized interactive HTML5 Executive Reset &amp; Merchandising Management Reporting Pack demo.">
+  <title>Executive Reset &amp; Merchandising Management Pack (Sanitized Demo)</title>
+  <style>
+    @layer base, theme, components;
+
+    @layer theme {
+      :root {
+        --bg-canvas-light: #f8fafc;
+        --bg-canvas-dark: #0b0f19;
+        --bg-surface-light: #ffffff;
+        --bg-surface-dark: #111827;
+        --bg-subtle-light: #f1f5f9;
+        --bg-subtle-dark: #1e293b;
+        --text-primary-light: #0f172a;
+        --text-primary-dark: #f8fafc;
+        --text-muted-light: #475569;
+        --text-muted-dark: #94a3b8;
+        --border-light: #e2e8f0;
+        --border-dark: #1e293b;
+        --brand-light: #0284c7;
+        --brand-dark: #38bdf8;
+        --good-light: #047857;
+        --good-dark: #34d399;
+        --warn-light: #b45309;
+        --warn-dark: #fbbf24;
+        --bad-light: #b91c1c;
+        --bad-dark: #f87171;
+
+        --bg-canvas: var(--bg-canvas-light);
+        --bg-surface: var(--bg-surface-light);
+        --bg-subtle: var(--bg-subtle-light);
+        --text-primary: var(--text-primary-light);
+        --text-muted: var(--text-muted-light);
+        --border-color: var(--border-light);
+        --brand: var(--brand-light);
+        --good: var(--good-light);
+        --warn: var(--warn-light);
+        --bad: var(--bad-light);
+
+        @media (prefers-color-scheme: dark) {
+          --bg-canvas: var(--bg-canvas-dark);
+          --bg-surface: var(--bg-surface-dark);
+          --bg-subtle: var(--bg-subtle-dark);
+          --text-primary: var(--text-primary-dark);
+          --text-muted: var(--text-muted-dark);
+          --border-color: var(--border-dark);
+          --brand: var(--brand-dark);
+          --good: var(--good-dark);
+          --warn: var(--warn-dark);
+          --bad: var(--bad-dark);
+        }
+
+        @supports (color: light-dark(white, black)) {
+          --bg-canvas: light-dark(var(--bg-canvas-light), var(--bg-canvas-dark));
+          --bg-surface: light-dark(var(--bg-surface-light), var(--bg-surface-dark));
+          --bg-subtle: light-dark(var(--bg-subtle-light), var(--bg-subtle-dark));
+          --text-primary: light-dark(var(--text-primary-light), var(--text-primary-dark));
+          --text-muted: light-dark(var(--text-muted-light), var(--text-muted-dark));
+          --border-color: light-dark(var(--border-light), var(--border-dark));
+          --brand: light-dark(var(--brand-light), var(--brand-dark));
+          --good: light-dark(var(--good-light), var(--good-dark));
+          --warn: light-dark(var(--warn-light), var(--warn-dark));
+          --bad: light-dark(var(--bad-light), var(--bad-dark));
+        }
+
+        color-scheme: light dark;
+        accent-color: var(--brand);
+        --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+    }
+
+    @layer base {
+      html, body, div, header, nav, main, section, article, footer,
+      h1, h2, h3, p, ul, li, table, thead, tbody, tr, th, td, select, input, button, search {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--bg-canvas);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        line-height: 1.55;
+        padding-inline: 1.25rem;
+      }
+
+      a { color: var(--brand); }
+    }
+
+    @layer components {
+      .wrap {
+        max-inline-size: 68rem;
+        margin-inline: auto;
+        padding-block: 2rem;
+      }
+
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding-block-end: 1.25rem;
+        border-block-end: 1px solid var(--border-color);
+        margin-block-end: 1.75rem;
+      }
+
+      .pill {
+        display: inline-block;
+        background-color: var(--bg-subtle);
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        padding-block: 0.2rem;
+        padding-inline: 0.6rem;
+        border-radius: 999px;
+      }
+
+      h1 {
+        font-size: clamp(1.5rem, 3vw, 2.15rem);
+        line-height: 1.2;
+        margin-block-end: 0.5rem;
+      }
+
+      .lead {
+        color: var(--text-muted);
+        margin-block-end: 1.5rem;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr));
+        gap: 0.875rem;
+        margin-block-end: 2rem;
+      }
+
+      .kpi-card {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 1rem;
+      }
+
+      .kpi-label {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        display: block;
+      }
+
+      .kpi-value {
+        font-family: var(--font-mono);
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: block;
+        margin-block: 0.2rem;
+      }
+
+      .kpi-delta {
+        font-size: 0.75rem;
+        font-family: var(--font-mono);
+      }
+
+      .good { color: var(--good); }
+      .warn { color: var(--warn); }
+      .bad { color: var(--bad); }
+
+      .panel {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 0.625rem;
+        padding: 1.25rem;
+        margin-block-end: 1.5rem;
+      }
+
+      .panel h2 {
+        font-size: 1.15rem;
+        margin-block-end: 0.75rem;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+        gap: 1.25rem;
+      }
+
+      .bridge-list {
+        list-style: none;
+        display: grid;
+        gap: 0.65rem;
+      }
+
+      .bridge-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1rem;
+        padding-block-end: 0.5rem;
+        border-block-end: 1px dashed var(--border-color);
+        font-size: 0.9375rem;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-block-end: 1rem;
+      }
+
+      .controls select, .controls input {
+        background-color: var(--bg-canvas);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+        padding: 0.45rem 0.7rem;
+        font: inherit;
+        font-size: 0.875rem;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+
+      th, td {
+        text-align: start;
+        padding: 0.6rem 0.75rem;
+        border-block-end: 1px solid var(--border-color);
+      }
+
+      th {
+        color: var(--text-muted);
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .num {
+        text-align: end;
+        font-family: var(--font-mono);
+      }
+
+      .bar-track {
+        inline-size: 100%;
+        block-size: 0.55rem;
+        background-color: var(--bg-subtle);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        block-size: 100%;
+        background-color: var(--brand);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div>
+        <span class="pill">SANITIZED INTERACTIVE DEMO &bull; SYNTHETIC DATA</span>
+      </div>
+      <nav aria-label="Demo navigation">
+        <a href="../index.html">&larr; Back to Portfolio</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Executive Reset Coverage &amp; Merchandising Pack (Week 45)</h1>
+      <p class="lead">
+        Interactive HTML5 management pack modeling the Weekly Project Tracker &amp; R2 Reset Coverage architecture: leads with decision-ready KPIs, decomposes variance into permanent vs. timing drivers, and supports live drilldown filtering.
+      </p>
+
+      <section class="kpi-grid" aria-label="Headline KPIs" id="kpi-strip"></section>
+
+      <div class="two-col">
+        <section class="panel" aria-labelledby="bridge-heading">
+          <h2 id="bridge-heading">Coverage Variance Bridge (Plan 88.0% &rarr; Actual 82.4%)</h2>
+          <ul class="bridge-list">
+            <li class="bridge-item">
+              <span>Target Plan Coverage</span>
+              <strong class="num">88.0%</strong>
+            </li>
+            <li class="bridge-item">
+              <span>Timing / Phasing: Late fixture delivery in West Region (shifts to W46)</span>
+              <strong class="num warn">-3.1 pts</strong>
+            </li>
+            <li class="bridge-item">
+              <span>Permanent Driver: Open field labor capacity in Tier-1 Metro</span>
+              <strong class="num bad">-2.5 pts</strong>
+            </li>
+            <li class="bridge-item">
+              <span>Actual Coverage (Completed + Scheduled / Qualified)</span>
+              <strong class="num">82.4%</strong>
+            </li>
+          </ul>
+        </section>
+
+        <section class="panel" aria-labelledby="chart-heading">
+          <h2 id="chart-heading">Coverage by Partner Tier (SVG)</h2>
+          <svg id="tier-chart" viewBox="0 0 420 175" width="100%" role="img" aria-labelledby="chart-heading">
+            <g font-family="system-ui, sans-serif" font-size="12" fill="currentColor"></g>
+          </svg>
+        </section>
+      </div>
+
+      <section class="panel" aria-labelledby="grid-heading">
+        <h2 id="grid-heading">Project &amp; Visit Drilldown</h2>
+        <search aria-label="Filter projects">
+          <div class="controls">
+            <select id="status-filter" aria-label="Filter by status">
+              <option value="ALL">All Statuses</option>
+              <option value="On Track">On Track</option>
+              <option value="At Risk">At Risk</option>
+              <option value="Escalated">Escalated</option>
+            </select>
+            <input id="text-filter" type="search" placeholder="Search partner, region, or owner..." aria-label="Search partner, region, or owner">
+          </div>
+        </search>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Partner Segment</th>
+                <th>Owner</th>
+                <th>Status</th>
+                <th class="num">Qualified</th>
+                <th class="num">Completed</th>
+                <th class="num">Scheduled</th>
+                <th class="num">Coverage %</th>
+                <th>Progress</th>
+              </tr>
+            </thead>
+            <tbody id="project-rows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="actions-heading">
+        <h2 id="actions-heading">Owned Action Log (Decisions &amp; Escalations)</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Driver Type</th>
+                <th>Owner</th>
+                <th>Due Date</th>
+                <th class="num">Stores at Stake</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Reallocate 3rd-party merchandisers to Tier-1 Metro Q1 OOS stores</td>
+                <td>Permanent</td>
+                <td>Field Ops Lead</td>
+                <td>2026-11-18</td>
+                <td class="num bad">412</td>
+              </tr>
+              <tr>
+                <td>Confirm W46 carrier drop for delayed West Region endcap fixtures</td>
+                <td>Timing</td>
+                <td>Logistics PM</td>
+                <td>2026-11-15</td>
+                <td class="num warn">510</td>
+              </tr>
+              <tr>
+                <td>Run 21-day rolling ACS audit on unverified store-level completions</td>
+                <td>Data Quality</td>
+                <td>Analytics Eng</td>
+                <td>2026-11-14</td>
+                <td class="num">185</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const PROJECTS = [
+      { id: "PRJ-401", partner: "National Grocery — East", tier: "Tier 1", owner: "M. Chen", status: "On Track", qualified: 4200, completed: 2940, scheduled: 924 },
+      { id: "PRJ-402", partner: "Big-Box Electronics — West", tier: "Tier 1", owner: "R. Patel", status: "At Risk", qualified: 3100, completed: 1612, scheduled: 744 },
+      { id: "PRJ-403", partner: "Regional Pharmacy — Midwest", tier: "Tier 2", owner: "S. Lopez", status: "On Track", qualified: 2650, completed: 1988, scheduled: 450 },
+      { id: "PRJ-404", partner: "Club Wholesale — South", tier: "Tier 1", owner: "D. Kim", status: "Escalated", qualified: 1950, completed: 897, scheduled: 390 },
+      { id: "PRJ-405", partner: "Canada Mass Retail", tier: "Tier 2", owner: "A. Brooks", status: "On Track", qualified: 1800, completed: 1296, scheduled: 360 },
+      { id: "PRJ-406", partner: "Home Improvement — Central", tier: "Tier 3", owner: "J. Nguyen", status: "At Risk", qualified: 1400, completed: 742, scheduled: 294 }
+    ];
+
+    const statusFilter = document.getElementById("status-filter");
+    const textFilter = document.getElementById("text-filter");
+
+    function render() {
+      const st = statusFilter.value;
+      const q = textFilter.value.trim().toLowerCase();
+      const rows = PROJECTS.filter(p =>
+        (st === "ALL" || p.status === st) &&
+        (!q || `${p.id} ${p.partner} ${p.owner} ${p.tier}`.toLowerCase().includes(q))
+      );
+
+      const totals = rows.reduce((acc, r) => {
+        acc.qualified += r.qualified;
+        acc.completed += r.completed;
+        acc.scheduled += r.scheduled;
+        return acc;
+      }, { qualified: 0, completed: 0, scheduled: 0 });
+
+      const cov = totals.qualified ? ((totals.completed + totals.scheduled) / totals.qualified) * 100 : 0;
+      const open = Math.max(0, totals.qualified - totals.completed - totals.scheduled);
+
+      document.getElementById("kpi-strip").innerHTML = [
+        { label: "Active Projects", val: rows.length, delta: "In-window view", cls: "" },
+        { label: "Qualified Visits", val: totals.qualified.toLocaleString(), delta: "Total scope", cls: "" },
+        { label: "Completed Visits", val: totals.completed.toLocaleString(), delta: `${totals.qualified ? ((totals.completed / totals.qualified) * 100).toFixed(1) : 0}% of scope`, cls: "good" },
+        { label: "Open Unscheduled", val: open.toLocaleString(), delta: "Actionable backlog", cls: open > 2000 ? "bad" : "warn" },
+        { label: "Coverage %", val: `${cov.toFixed(1)}%`, delta: "Target: 88.0%", cls: cov >= 88 ? "good" : "warn" }
+      ].map(k => `
+        <article class="kpi-card">
+          <span class="kpi-label">${k.label}</span>
+          <strong class="kpi-value ${k.cls}">${k.val}</strong>
+          <span class="kpi-delta ${k.cls}">${k.delta}</span>
+        </article>
+      `).join("");
+
+      document.getElementById("project-rows").innerHTML = rows.map(r => {
+        const pct = ((r.completed + r.scheduled) / r.qualified) * 100;
+        const cls = r.status === "On Track" ? "good" : r.status === "Escalated" ? "bad" : "warn";
+        return `
+          <tr>
+            <td><code>${r.id}</code></td>
+            <td>${r.partner}</td>
+            <td>${r.owner}</td>
+            <td class="${cls}"><strong>${r.status}</strong></td>
+            <td class="num">${r.qualified.toLocaleString()}</td>
+            <td class="num">${r.completed.toLocaleString()}</td>
+            <td class="num">${r.scheduled.toLocaleString()}</td>
+            <td class="num">${pct.toFixed(1)}%</td>
+            <td style="min-inline-size: 6rem;">
+              <div class="bar-track"><div class="bar-fill" style="inline-size: ${Math.min(100, pct)}%"></div></div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      const tiers = ["Tier 1", "Tier 2", "Tier 3"];
+      const g = document.querySelector("#tier-chart g");
+      g.innerHTML = tiers.map((tier, idx) => {
+        const subset = rows.filter(r => r.tier === tier);
+        const qSum = subset.reduce((s, r) => s + r.qualified, 0);
+        const cSum = subset.reduce((s, r) => s + r.completed + r.scheduled, 0);
+        const pct = qSum ? (cSum / qSum) * 100 : 0;
+        const y = 20 + idx * 50;
+        const barW = Math.round((pct / 100) * 260);
+        return `
+          <text x="0" y="${y + 15}">${tier}</text>
+          <rect x="65" y="${y}" width="260" height="22" rx="4" fill="currentColor" opacity="0.12"></rect>
+          <rect x="65" y="${y}" width="${barW}" height="22" rx="4" fill="var(--brand)"></rect>
+          <text x="335" y="${y + 15}" font-family="ui-monospace, monospace">${pct.toFixed(1)}%</text>
+        `;
+      }).join("");
+    }
+
+    statusFilter.addEventListener("change", render);
+    textFilter.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>
