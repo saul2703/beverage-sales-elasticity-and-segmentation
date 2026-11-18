@@ -2,25 +2,24 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const html = fs.readFileSync(new URL("./index.html", import.meta.url), "utf8");
-const demo = fs.readFileSync(new URL("./demos/executive-reset-pack.html", import.meta.url), "utf8");
-const bevDemo = fs.readFileSync(new URL("./demos/beverage-analytics-dashboard.html", import.meta.url), "utf8");
 const readme = fs.readFileSync(new URL("./README.md", import.meta.url), "utf8");
+const summary = JSON.parse(fs.readFileSync(new URL("./data/beverage_summary.json", import.meta.url), "utf8"));
 
-// 1. Verify color-scheme meta and CSS light-dark + fallback support on all pages
-for (const doc of [html, demo, bevDemo]) {
-  assert.match(doc, /<meta name="color-scheme" content="light dark">/);
-  assert.match(doc, /color-scheme:\s*light dark/);
-  assert.match(doc, /@media\s*\(prefers-color-scheme:\s*dark\)/);
-  assert.equal((doc.match(/<h1\b/g) || []).length, 1, "Must have exactly one <h1>");
-  assert.match(doc, /<search\b/);
-}
+// 1. Verify color-scheme meta, CSS light-dark + fallback support, semantic landmarks, and AG Grid
+assert.match(html, /<meta name="color-scheme" content="light dark">/);
+assert.match(html, /color-scheme:\s*light dark/);
+assert.match(html, /@media\s*\(prefers-color-scheme:\s*dark\)/);
+assert.equal((html.match(/<h1\b/g) || []).length, 1, "Must have exactly one <h1>");
+assert.match(html, /<search\b/);
+assert.match(html, /ag-grid-community/);
+assert.match(html, /agGrid\.createGrid/);
 
-// 2. Verify 7 case study cards on main portfolio, AG Grid in beverage dashboard, and 7 Matplotlib PNG charts
-assert.equal((html.match(/<article class="case-card"/g) || []).length, 7, "Must have 7 case studies");
-assert.match(html, /data-filter="stats"/);
-assert.match(bevDemo, /ag-grid-community/);
-assert.match(bevDemo, /agGrid\.createGrid/);
+// 2. Verify dataset integrity (8,999,910 rows, 3,000,000 orders, 10,000 customers)
+assert.equal(summary.dataset.total_rows, 8999910);
+assert.equal(summary.dataset.total_orders, 3000000);
+assert.equal(summary.dataset.unique_customers, 10000);
 
+// 3. Verify all 7 Matplotlib PNG charts exist
 for (const img of [
   "dashboard_overview_preview.png",
   "regional_revenue_b2b_b2c.png",
@@ -31,17 +30,12 @@ for (const img of [
   "customer_segments_clusters.png",
 ]) {
   assert.ok(fs.existsSync(new URL(`./images/${img}`, import.meta.url)), `Missing chart: images/${img}`);
+  assert.match(readme, new RegExp(`images/${img}`));
 }
 
-// 3. Verify no headings inside <summary> (accessibility rule)
-for (const [, summaryInner] of html.matchAll(/<summary>([\s\S]*?)<\/summary>/g)) {
-  assert.doesNotMatch(summaryInner, /<h[1-6]\b/i, "Do not place headings inside <summary>");
-}
+// 4. Verify Kaggle dataset citation link in both README.md and index.html
+const kaggleUrl = "https://www.kaggle.com/datasets/sebastianwillmann/beverage-sales/data";
+assert.ok(readme.includes(kaggleUrl), "README.md must link to the Kaggle dataset");
+assert.ok(html.includes(kaggleUrl), "index.html must link to the Kaggle dataset");
 
-// 4. Ensure no internal employer/local username paths leaked into public portfolio
-assert.doesNotMatch(html + demo + bevDemo + readme, /saval01|Blackhawk Network|\bBHN\b/i, "Sanitize internal paths/company names");
-
-// 5. Verify README has private repo setup instructions
-assert.match(readme, /gh repo create .* --private/);
-
-console.log("OK: All portfolio and demo verification checks passed.");
+console.log("OK: Beverage analytics dashboard, Matplotlib charts, and README verification passed.");

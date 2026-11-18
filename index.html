@@ -4,10 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Data Engineering &amp; Applied Analytics Portfolio — Streaming retail inventory rollups, multi-source store prioritization pipelines, and automated OOS detection.">
-  <title>Saul Avalos | Data Engineering &amp; Applied Analytics Portfolio</title>
+  <meta name="description" content="Interactive AG Grid HTML5 Dashboard for 9M-Row German Beverage Sales &amp; K-Means Customer Segmentation Case Study.">
+  <title>German Beverage Sales &amp; Customer Segmentation | AG Grid Analytics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@33.3.2/dist/ag-grid-community.min.js"></script>
   <style>
-    @layer base, theme, components, utilities;
+    @layer base, theme, components;
 
     @layer theme {
       :root {
@@ -25,10 +26,12 @@
         --border-dark: #1e293b;
         --brand-light: #0284c7;
         --brand-dark: #38bdf8;
-        --brand-subtle-light: #e0f2fe;
-        --brand-subtle-dark: #0c4a6e;
-        --metric-positive-light: #047857;
-        --metric-positive-dark: #34d399;
+        --good-light: #047857;
+        --good-dark: #34d399;
+        --warn-light: #b45309;
+        --warn-dark: #fbbf24;
+        --bad-light: #b91c1c;
+        --bad-dark: #f87171;
 
         --bg-canvas: var(--bg-canvas-light);
         --bg-surface: var(--bg-surface-light);
@@ -37,8 +40,9 @@
         --text-muted: var(--text-muted-light);
         --border-color: var(--border-light);
         --brand: var(--brand-light);
-        --brand-subtle: var(--brand-subtle-light);
-        --metric-positive: var(--metric-positive-light);
+        --good: var(--good-light);
+        --warn: var(--warn-light);
+        --bad: var(--bad-light);
 
         @media (prefers-color-scheme: dark) {
           --bg-canvas: var(--bg-canvas-dark);
@@ -48,8 +52,9 @@
           --text-muted: var(--text-muted-dark);
           --border-color: var(--border-dark);
           --brand: var(--brand-dark);
-          --brand-subtle: var(--brand-subtle-dark);
-          --metric-positive: var(--metric-positive-dark);
+          --good: var(--good-dark);
+          --warn: var(--warn-dark);
+          --bad: var(--bad-dark);
         }
 
         @supports (color: light-dark(white, black)) {
@@ -60,8 +65,9 @@
           --text-muted: light-dark(var(--text-muted-light), var(--text-muted-dark));
           --border-color: light-dark(var(--border-light), var(--border-dark));
           --brand: light-dark(var(--brand-light), var(--brand-dark));
-          --brand-subtle: light-dark(var(--brand-subtle-light), var(--brand-subtle-dark));
-          --metric-positive: light-dark(var(--metric-positive-light), var(--metric-positive-dark));
+          --good: light-dark(var(--good-light), var(--good-dark));
+          --warn: light-dark(var(--warn-light), var(--warn-dark));
+          --bad: light-dark(var(--bad-light), var(--bad-dark));
         }
 
         color-scheme: light dark;
@@ -72,9 +78,8 @@
     }
 
     @layer base {
-      html, body, div, header, nav, main, section, article, aside, footer,
-      h1, h2, h3, p, ul, ol, li, dl, dt, dd, figure, figcaption, pre, code,
-      details, summary, button, search {
+      html, body, div, header, nav, main, section, article, figure, figcaption, footer,
+      h1, h2, h3, p, ul, li, table, thead, tbody, tr, th, td, select, input, button, search {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
@@ -84,648 +89,477 @@
         background-color: var(--bg-canvas);
         color: var(--text-primary);
         font-family: var(--font-sans);
-        line-height: 1.6;
+        line-height: 1.55;
         padding-inline: 1.25rem;
       }
 
-      a {
-        color: var(--brand);
-        text-decoration-thickness: 1px;
-        text-underline-offset: 0.2em;
-      }
-
-      a:hover {
-        text-decoration-thickness: 2px;
-      }
-
-      code, pre {
-        font-family: var(--font-mono);
-        font-size: 0.875em;
-      }
+      a { color: var(--brand); }
     }
 
     @layer components {
-      .container {
-        max-inline-size: 64rem;
+      .wrap {
+        max-inline-size: 76rem;
         margin-inline: auto;
-        padding-block: 2.5rem;
+        padding-block: 2rem;
       }
 
-      .site-header {
+      .topbar {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
         gap: 1rem;
-        padding-block-end: 2rem;
+        padding-block-end: 1.25rem;
         border-block-end: 1px solid var(--border-color);
-      }
-
-      .nav-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.25rem;
-        list-style: none;
-      }
-
-      .hero {
-        padding-block: 2.5rem;
-        border-block-end: 1px solid var(--border-color);
-      }
-
-      .status-badge {
-        display: inline-block;
-        background-color: var(--brand-subtle);
-        color: var(--brand);
-        font-size: 0.8125rem;
-        font-weight: 600;
-        padding-block: 0.25rem;
-        padding-inline: 0.75rem;
-        border-radius: 999px;
-        margin-block-end: 1rem;
-      }
-
-      .hero h1 {
-        font-size: clamp(1.85rem, 3.5vw, 2.75rem);
-        line-height: 1.2;
-        letter-spacing: -0.02em;
-        margin-block-end: 0.75rem;
-      }
-
-      .hero-lead {
-        color: var(--text-muted);
-        font-size: 1.125rem;
-        max-inline-size: 52rem;
         margin-block-end: 1.5rem;
       }
 
-      .metrics-strip {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-        gap: 1rem;
-        margin-block-start: 1.5rem;
+      .pill {
+        display: inline-block;
+        background-color: var(--bg-subtle);
+        color: var(--brand);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding-block: 0.25rem;
+        padding-inline: 0.7rem;
+        border-radius: 999px;
       }
 
-      .metric-card {
+      h1 {
+        font-size: clamp(1.55rem, 3vw, 2.25rem);
+        line-height: 1.2;
+        margin-block-end: 0.5rem;
+      }
+
+      .lead {
+        color: var(--text-muted);
+        max-inline-size: 62rem;
+        margin-block-end: 1.5rem;
+      }
+
+      .controls-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
         background-color: var(--bg-surface);
         border: 1px solid var(--border-color);
         border-radius: 0.5rem;
-        padding-block: 1rem;
-        padding-inline: 1.25rem;
+        padding: 0.875rem 1rem;
+        margin-block-end: 1.5rem;
       }
 
-      .metric-value {
+      .controls-bar select, .controls-bar input, .controls-bar button {
+        background-color: var(--bg-canvas);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+        padding: 0.45rem 0.75rem;
+        font: inherit;
+        font-size: 0.875rem;
+      }
+
+      .controls-bar button {
+        background-color: var(--brand);
+        color: #ffffff;
+        border-color: var(--brand);
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+        gap: 0.875rem;
+        margin-block-end: 1.75rem;
+      }
+
+      .kpi-card {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 1rem 1.15rem;
+      }
+
+      .kpi-label {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
         display: block;
-        font-size: 1.5rem;
+      }
+
+      .kpi-value {
+        font-family: var(--font-mono);
+        font-size: 1.45rem;
         font-weight: 700;
-        color: var(--metric-positive);
+        display: block;
+        margin-block: 0.2rem;
+      }
+
+      .kpi-delta {
+        font-size: 0.75rem;
         font-family: var(--font-mono);
       }
 
-      .metric-label {
-        font-size: 0.875rem;
-        color: var(--text-muted);
+      .good { color: var(--good); }
+      .warn { color: var(--warn); }
+      .bad { color: var(--bad); }
+
+      .panel {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 0.625rem;
+        padding: 1.25rem;
+        margin-block-end: 1.5rem;
       }
 
-      .section-header {
+      .panel-header {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
         align-items: baseline;
-        gap: 1rem;
-        margin-block-start: 2.5rem;
-        margin-block-end: 1.5rem;
-      }
-
-      .filter-bar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-
-      .filter-btn {
-        background-color: var(--bg-surface);
-        color: var(--text-muted);
-        border: 1px solid var(--border-color);
-        border-radius: 0.375rem;
-        padding-block: 0.375rem;
-        padding-inline: 0.75rem;
-        font: inherit;
-        font-size: 0.875rem;
-        cursor: pointer;
-      }
-
-      .filter-btn:hover:not(:disabled) {
-        border-color: var(--brand);
-        color: var(--text-primary);
-      }
-
-      .filter-btn[aria-pressed="true"] {
-        background-color: var(--brand-subtle);
-        border-color: var(--brand);
-        color: var(--brand);
-        font-weight: 600;
-      }
-
-      .case-grid {
-        display: grid;
-        gap: 1.75rem;
-      }
-
-      .case-card {
-        background-color: var(--bg-surface);
-        border: 1px solid var(--border-color);
-        border-radius: 0.625rem;
-        padding-block: 1.5rem;
-        padding-inline: 1.5rem;
-      }
-
-      .case-meta {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
         gap: 0.75rem;
-        margin-block-end: 0.75rem;
+        margin-block-end: 0.875rem;
       }
 
-      .tag-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        list-style: none;
+      .panel h2 {
+        font-size: 1.15rem;
       }
 
-      .tag {
-        background-color: var(--bg-subtle);
-        color: var(--text-muted);
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        padding-block: 0.2rem;
-        padding-inline: 0.55rem;
-        border-radius: 0.25rem;
+      .two-col {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+        gap: 1.25rem;
       }
 
-      .case-card h3 {
-        font-size: 1.35rem;
-        margin-block-end: 0.5rem;
+      .grid-box {
+        inline-size: 100%;
+        block-size: 26rem;
       }
 
-      .case-summary {
-        color: var(--text-muted);
-        margin-block-end: 1rem;
+      .chart-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+        gap: 1.25rem;
       }
 
-      .impact-list {
-        list-style: none;
-        border-inline-start: 3px solid var(--brand);
-        padding-inline-start: 1rem;
-        margin-block-end: 1.25rem;
+      .chart-fig {
+        background-color: var(--bg-canvas);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 0.75rem;
       }
 
-      .impact-list li:not(:last-child) {
-        margin-block-end: 0.35rem;
+      .chart-fig img {
+        inline-size: 100%;
+        block-size: auto;
+        border-radius: 0.375rem;
+        display: block;
       }
 
-      .code-figure {
-        margin-block: 1rem;
-      }
-
-      .code-figure figcaption {
+      .chart-fig figcaption {
         font-size: 0.8125rem;
         color: var(--text-muted);
-        margin-block-end: 0.35rem;
-        font-family: var(--font-mono);
+        margin-block-start: 0.5rem;
       }
 
-      .code-figure pre {
-        color-scheme: dark;
-        accent-color: var(--brand);
-        background-color: #0f172a;
-        color: #e2e8f0;
-        padding-block: 0.875rem;
-        padding-inline: 1rem;
-        border-radius: 0.375rem;
-        overflow-x: auto;
-      }
-
-      details {
-        border-block-start: 1px solid var(--border-color);
-        padding-block-start: 0.875rem;
-        margin-block-start: 0.875rem;
-      }
-
-      summary {
-        list-style: none;
-        display: flex;
-        align-items: center;
-        gap: 0.5ch;
-        font-weight: 600;
-        font-size: 0.9375rem;
-        cursor: pointer;
-        color: var(--brand);
-
-        &::before {
-          content: "";
-          inline-size: 0.9em;
-          block-size: 0.9em;
-          flex-shrink: 0;
-          background-color: currentColor;
-          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='black' d='M3.2 5.5 8 10.3l4.8-4.8 1.2 1.2-6 6-6-6 1.2-1.2Z'/%3E%3C/svg%3E") no-repeat center / contain;
-          rotate: -90deg;
-        }
-
-        &:dir(rtl)::before {
-          rotate: 90deg;
-        }
-
-        details[open] > &::before {
-          rotate: 0deg;
-        }
-
-        @media (prefers-reduced-motion: no-preference) {
-          &::before {
-            transition: rotate 0.2s;
-          }
-        }
-      }
-
-      details::details-content {
-        interpolate-size: allow-keywords;
-        overflow: clip;
-        contain: layout;
-      }
-
-      details:not([open])::details-content {
-        block-size: 0;
-      }
-
-      @media (prefers-reduced-motion: no-preference) {
-        details::details-content {
-          transition: block-size, content-visibility, display;
-          transition-duration: 0.25s;
-          transition-timing-function: ease-in-out;
-          transition-behavior: allow-discrete;
-        }
-      }
-
-      .details-body {
-        padding-block-start: 0.75rem;
-        color: var(--text-muted);
-        font-size: 0.9375rem;
-      }
-
-      .site-footer {
-        margin-block-start: 3rem;
-        padding-block-start: 1.5rem;
-        border-block-start: 1px solid var(--border-color);
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 1rem;
-        color: var(--text-muted);
+      table {
+        inline-size: 100%;
+        border-collapse: collapse;
         font-size: 0.875rem;
+      }
+
+      th, td {
+        text-align: start;
+        padding: 0.55rem 0.7rem;
+        border-block-end: 1px solid var(--border-color);
+      }
+
+      th {
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .num {
+        text-align: end;
+        font-family: var(--font-mono);
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header class="site-header">
-      <strong>Saul Avalos // Data Engineering &amp; Retail Analytics</strong>
-      <nav aria-label="Primary navigation">
-        <ul class="nav-list">
-          <li><a href="#case-studies">Case Studies</a></li>
-          <li><a href="#stack">Core Stack</a></li>
-          <li><a href="https://github.com/saul2703">GitHub</a></li>
-          <li><a href="mailto:saulavalos27@gmail.com">Contact</a></li>
-        </ul>
+  <div class="wrap">
+    <header class="topbar">
+      <div>
+        <span class="pill">KAGGLE CASE STUDY &bull; 8,999,910 TRANSACTIONS &bull; AG GRID + MATPLOTLIB</span>
+      </div>
+      <nav aria-label="Dashboard navigation">
+        <a href="https://www.kaggle.com/datasets/sebastianwillmann/beverage-sales/data">Kaggle Dataset (752.7 MB)</a> &bull;
+        <a href="https://github.com/saul2703/beverage-sales-elasticity-and-segmentation">GitHub Repository &rarr;</a>
       </nav>
     </header>
 
     <main>
-      <section class="hero" aria-labelledby="hero-heading">
-        <span class="status-badge">Available for Data Engineering &amp; Applied Analytics Roles</span>
-        <h1 id="hero-heading">High-throughput inventory pipelines, deterministic SKU normalization, and store prioritization engines.</h1>
-        <p class="hero-lead">
-          I build production Python and SQL data pipelines that turn messy, multi-part retail feeds into reliable, deduplicated operational decisions—prioritizing throughput, data integrity, and zero manual reconciliation.
-        </p>
+      <h1>German Beverage Sales, Price Elasticity &amp; K-Means Customer Segmentation</h1>
+      <p class="lead">
+        End-to-end exploratory data analysis, statistical discount elasticity testing, and unsupervised K-Means customer clustering across <strong>8,999,910 order lines</strong> (<strong>3.0M orders</strong>, <strong>10,000 customers</strong>, <strong>16 German states</strong>, <strong>$1.18B net revenue</strong> from 2021–2023).
+      </p>
 
-        <div class="metrics-strip">
-          <div class="metric-card">
-            <span class="metric-value">2x Faster</span>
-            <span class="metric-label">Streaming CSV/XLSX ingestion via 300k-row chunks &amp; column pruning</span>
-          </div>
-          <div class="metric-card">
-            <span class="metric-value">6 Sources</span>
-            <span class="metric-label">Unified into 5,000-store execution chunks with 21-day rolling joins</span>
-          </div>
-          <div class="metric-card">
-            <span class="metric-value">0 Double-Counts</span>
-            <span class="metric-label">Stem-level file dedup &amp; canonical 32-hex GUID normalization</span>
-          </div>
+      <search aria-label="Filter dashboard metrics and AG Grids">
+        <div class="controls-bar">
+          <label for="channel-filter"><strong>Channel:</strong></label>
+          <select id="channel-filter">
+            <option value="ALL">All Channels (B2B + B2C)</option>
+            <option value="B2B">B2B Wholesale Only</option>
+            <option value="B2C">B2C Retail Only</option>
+          </select>
+
+          <label for="category-filter"><strong>Category:</strong></label>
+          <select id="category-filter">
+            <option value="ALL">All 4 Beverage Categories</option>
+            <option value="Alcoholic Beverages">Alcoholic Beverages</option>
+            <option value="Juices">Juices</option>
+            <option value="Soft Drinks">Soft Drinks</option>
+            <option value="Water">Water</option>
+          </select>
+
+          <input id="quick-search" type="search" placeholder="Filter 47 products or 16 regions..." aria-label="Quick filter products and regions">
+          <button type="button" id="export-btn">Export Product CSV</button>
         </div>
-      </section>
+      </search>
 
-      <section id="case-studies" aria-labelledby="projects-heading">
-        <div class="section-header">
-          <h2 id="projects-heading">Production Engineering Case Studies</h2>
-          <search aria-label="Filter case studies by domain">
-            <div class="filter-bar">
-              <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">All (7)</button>
-              <button type="button" class="filter-btn" data-filter="stats" aria-pressed="false">Statistical Analysis &amp; ML</button>
-              <button type="button" class="filter-btn" data-filter="bi" aria-pressed="false">HTML5 Reports &amp; AG Grid</button>
-              <button type="button" class="filter-btn" data-filter="rollup" aria-pressed="false">OOS &amp; Inventory Rollups</button>
-              <button type="button" class="filter-btn" data-filter="data" aria-pressed="false">Multi-Source ETL</button>
-              <button type="button" class="filter-btn" data-filter="ml" aria-pressed="false">Prioritization &amp; Ranking</button>
-            </div>
-          </search>
-        </div>
+      <section class="kpi-grid" id="kpi-strip" aria-label="Summary KPIs"></section>
 
-        <div class="case-grid">
-          <!-- Featured Kaggle Flagship Case Study: 8.99M-Row Beverage Sales, Elasticity & K-Means + AG Grid -->
-          <article class="case-card" data-category="stats">
-            <div class="case-meta">
-              <ul class="tag-list" aria-label="Technologies used">
-                <li class="tag">8.99M Rows (752.7 MB)</li>
-                <li class="tag">K-Means++ &amp; PCA</li>
-                <li class="tag">AG Grid Dashboard</li>
-                <li class="tag">Matplotlib / Python</li>
-              </ul>
-              <a href="demos/beverage-analytics-dashboard.html">Launch AG Grid &amp; Matplotlib Dashboard &rarr;</a>
-            </div>
-            <h3>Flagship Case Study: German Beverage Sales, Discount Elasticity &amp; K-Means Customer Segmentation ($1.18B Revenue)</h3>
-            <p class="case-summary">
-              Streamed <strong>8,999,910 transactions</strong> (<strong>3.0M orders</strong>, <strong>10,000 customers</strong> across <strong>16 German states</strong>) in 22.2 seconds to quantify promotional margin leakage, test discount tier volume elasticity, segment customers via K-Means++ clustering, and deliver a self-service <strong>AG Grid HTML5 dashboard</strong>.
-            </p>
-            <ul class="impact-list">
-              <li><strong>Promotional Margin Leakage ($96.41M):</strong> Proved that stepping B2B discounts from 10% to 15% yields only <strong>+14.8% incremental line volume</strong> (`62.05 &rarr; 71.26` units, vs. +82.9% from 5% to 10%) while leaking <strong>$28.68M</strong> in margin—identifying a <strong>$9.5M–$14.3M</strong> annual margin recovery opportunity.</li>
-              <li><strong>Category Pareto Asymmetry:</strong> Showed that while all 4 categories move ~52.0M units each, <strong>Alcoholic Beverages drive 77.5% ($911.80M) of net revenue</strong>, led by Veuve Clicquot ($202.58M) and Moët &amp; Chandon ($175.09M).</li>
-              <li><strong>Unsupervised Customer Clustering (k = 4, Silhouette = 0.5384):</strong> Segmented 10,000 customers via z-score standardized features and 2D PCA (99.55% variance explained), isolating 1,873 Growth Wholesale Accounts where closing a 27.6-order frequency gap unlocks <strong>+$43.2M</strong>.</li>
-            </ul>
-            <details>
-              <summary>View Matplotlib Charts &amp; Interactive AG Grid Dashboard</summary>
-              <div class="details-body">
-                <p>Explore the interactive <a href="demos/beverage-analytics-dashboard.html">AG Grid &amp; Matplotlib Beverage Analytics Dashboard</a> (filter 47 brands &times; 16 German states and export CSVs) or inspect the full methodology and 7 publication-grade charts in <a href="README.md">README.md</a>.</p>
-              </div>
-            </details>
-          </article>
-
-          <!-- Case Study 0: HTML5 Interactive Reports -->
-          <article class="case-card" data-category="bi">
-            <div class="case-meta">
-              <ul class="tag-list" aria-label="Technologies used">
-                <li class="tag">HTML5 / SVG</li>
-                <li class="tag">AG-Grid</li>
-                <li class="tag">Management Reporting</li>
-                <li class="tag">Zero-Backend Portable BI</li>
-              </ul>
-              <a href="demos/executive-reset-pack.html">Launch Sanitized Live Demo &rarr;</a>
-            </div>
-            <h3>1. Self-Contained HTML5 Executive Reset &amp; Weekly Project Trackers</h3>
-            <p class="case-summary">
-              Replaced static 40-tab spreadsheets with single-file, zero-server HTML5 interactive reports (<code>R2 Reset Tracker</code> &amp; <code>Weekly Project Tracker</code>) combining AG-Grid drilldowns, SVG workload/coverage charts, and inline data-quality definitions.
-            </p>
-            <ul class="impact-list">
-              <li><strong>Decision-First KPI Strip:</strong> Surfaces Active Projects, Qualified/Completed/Scheduled Visits, Coverage %, and 14-day closing/starting windows on one screen.</li>
-              <li><strong>Driver-Based Variance &amp; Governance:</strong> Embeds metric formulas and data-check tooltips directly next to every KPI so stakeholders never debate definitions.</li>
-              <li><strong>Zero-Infra Distribution:</strong> Compiles weekly CSV/Excel exports into portable HTML5 packs shareable via SharePoint or email with full client-side filtering.</li>
-            </ul>
-            <details>
-              <summary>Management Reporting Design &amp; Sanitized Demo</summary>
-              <div class="details-body">
-                <p><strong>Why HTML5 over BI licenses?</strong> Field leads and external partners needed instant filtering and drilldowns without waiting on VPNs or paid BI seats. <a href="demos/executive-reset-pack.html">Open the sanitized interactive demo</a> to test the live KPI strip, variance bridge, SVG tier chart, and filterable grid.</p>
-              </div>
-            </details>
-          </article>
-
-          <!-- Case Study 1 -->
-          <article class="case-card" data-category="rollup">
-            <div class="case-meta">
-              <ul class="tag-list" aria-label="Technologies used">
-                <li class="tag">Python</li>
-                <li class="tag">Pandas Chunking</li>
-                <li class="tag">Deterministic Rules</li>
-                <li class="tag">GUID Canonicalization</li>
-              </ul>
-              <a href="#case-studies">OOS Rollup Engine &rarr;</a>
-            </div>
-            <h3>2. Deterministic Out-of-Stock (OOS) Daily Rollup &amp; Cloud Pipeline</h3>
-            <p class="case-summary">
-              Built an automated daily inventory rollup pipeline that ingests multi-part retail inventory dumps (`.csv` and `.xlsx`), enforces deterministic SKU whitelists and partner exclusions, and flags zero-stock and low-stock (`1 &lt;= qty &lt;= 5`) call-out stores.
-            </p>
-            <ul class="impact-list">
-              <li><strong>Zero Double-Counting:</strong> Implemented file-stem deduplication preferring `.csv` over `.xlsx` when both formats land in the same SharePoint/cloud drop folder, ignoring temporary lockfiles (`~$`) and duplicate downloads (`(1)`).</li>
-              <li><strong>Deterministic SKU Filtering:</strong> Replaced brittle regex heuristics with explicit US/Canada SKU whitelists (`VALID_PSGS`) to eliminate non-card fixture and signage noise.</li>
-              <li><strong>Canonical Store Keys:</strong> Normalized heterogeneous `STORE_GUID` formats into canonical 32-hex hyphenated UUIDs and stripped trailing `.0` float artifacts from store codes.</li>
-            </ul>
-
-            <figure class="code-figure">
-              <figcaption id="code-guid-norm">Canonical STORE_GUID normalization &amp; stem deduplication (Python)</figcaption>
-              <pre role="region" aria-labelledby="code-guid-norm" tabindex="0"><code>def c_guid(v):
-    if v is None or pd.isna(v):
-        return ""
-    s = re.sub(r"\.0$", "", str(v).strip()).upper().strip("{} ")
-    if s in {"", "NAN", "NONE", "NULL"}:
-        return ""
-    hex_only = re.sub(r"[^0-9A-F]", "", s)
-    if len(hex_only) == 32 and re.fullmatch(r"[0-9A-F-]+", s):
-        return f"{hex_only[:8]}-{hex_only[8:12]}-{hex_only[12:16]}-{hex_only[16:20]}-{hex_only[20:]}"
-    return s.lstrip("0") or "0" if s.isdigit() else s</code></pre>
-            </figure>
-
-            <details>
-              <summary>Architecture, Tradeoffs &amp; Edge Cases Solved</summary>
-              <div class="details-body">
-                <p><strong>Encoding &amp; Speed Fix:</strong> Raw retail exports contained `0xc9` (`É`) bytes that crashed default UTF-8 readers. Switching to `encoding="latin1"` with `usecols` projection cut memory usage and doubled ingestion speed.</p>
-                <p><strong>Low-Stock Secondary Visibility:</strong> Separated hard OOS (`ON_HAND_QTY == 0`) from low-stock (`1 &lt;= ON_HAND_QTY &lt;= 5`) so field teams can prioritize true stockouts before replenishment windows.</p>
-              </div>
-            </details>
-          </article>
-
-          <!-- Case Study 2 -->
-          <article class="case-card" data-category="data">
-            <div class="case-meta">
-              <ul class="tag-list" aria-label="Technologies used">
-                <li class="tag">Python</li>
-                <li class="tag">300k-Row Streaming</li>
-                <li class="tag">OpenPyXL</li>
-                <li class="tag">Schema Projection</li>
-              </ul>
-              <a href="#case-studies">Streaming Ingestion &rarr;</a>
-            </div>
-            <h3>3. High-Throughput Streaming Inventory Query &amp; Workbook Exporter</h3>
-            <p class="case-summary">
-              Engineered a memory-bounded ingestion layer to aggregate multi-hundred-thousand-row partner inventory files into store-level summaries (`ON_HAND_QTY`, `ON_ORDER_QTY`, `IN_TRANSIT_QTY`) with conditional partner/brand filtering.
-            </p>
-            <ul class="impact-list">
-              <li><strong>2x Faster Reads:</strong> Streamed CSVs in `300,000`-row chunks with `usecols` column pruning and vectorized `pd.to_numeric(..., errors="coerce")` coercion.</li>
-              <li><strong>Partner-Specific Rules:</strong> Applied conditional brand filtering per `PARTNER_CD` while preserving full-catalog aggregation for all other retail partners.</li>
-              <li><strong>Deliverable Guardrails:</strong> Automated workbook size assertions (`&lt; 50 MB`) so downstream Excel/SharePoint consumers never hit attachment or browser limits.</li>
-            </ul>
-
-            <figure class="code-figure">
-              <figcaption id="code-stream-chunk">Memory-bounded CSV/XLSX streaming with column projection (Python)</figcaption>
-              <pre role="region" aria-labelledby="code-stream-chunk" tabindex="0"><code>if p.suffix.lower() == ".csv":
-    parts = pd.read_csv(
-        p, dtype=str, encoding="latin1",
-        usecols=lambda c: c.strip().upper() in cols,
-        chunksize=300_000,
-    )
-else:
-    parts = pd.read_excel(
-        p, sheet_name=None, dtype=str,
-        usecols=lambda c: str(c).strip().upper() in cols,
-    ).values()</code></pre>
-            </figure>
-
-            <details>
-              <summary>Architecture, Tradeoffs &amp; Edge Cases Solved</summary>
-              <div class="details-body">
-                <p><strong>Why flat streaming dictionaries over full DataFrame concats?</strong> Concatenating raw multi-million-row string frames spiked RAM and slowed groupby joins. Aggregating directly into a `STORE_GUID`-keyed dictionary during chunk iteration kept memory flat.</p>
-                <p><strong>Resilient File Discovery:</strong> Automatically selects the newest date-stamped batch (`newest(folder, pattern)`) while excluding Office lockfiles (`~$`).</p>
-              </div>
-            </details>
-          </article>
-
-          <!-- Case Study 3 -->
-          <article class="case-card" data-category="ml">
-            <div class="case-meta">
-              <ul class="tag-list" aria-label="Technologies used">
-                <li class="tag">Python</li>
-                <li class="tag">Quartile Ranking</li>
-                <li class="tag">21-Day Rolling Joins</li>
-                <li class="tag">HTML5 Dashboards</li>
-              </ul>
-              <a href="#case-studies">Prioritization Engine &rarr;</a>
-            </div>
-            <h3>4. Unified 6-Source Store Escalation &amp; Quartile Prioritization Engine</h3>
-            <p class="case-summary">
-              Joined 6 operational workbooks—On-Hand Inventory, DSD Sales, Units Data, 21-day rolling field tracking (`REPORT_DATE - 21 days`), Master Store Escalation Engine, and Yearly Tier Calendar—into 5,000-store execution chunks ranked by joint sales/units quartiles.
-            </p>
-            <ul class="impact-list">
-              <li><strong>Multi-Source Reconciliation:</strong> Harmonized 6 heterogeneous schemas with explicit pre-flight file validation and missing-store fallback states (`Unavailable - store not in MSL`).</li>
-              <li><strong>Quartile Impact Scoring:</strong> Combined dollar sales and unit velocity into joint quartile ranks (`Joint_Store_Sales_Units_Quartile_Rank`) so field reps visit highest-ROI out-of-stock stores first.</li>
-              <li><strong>Execution-Ready Output:</strong> Partitioned prioritized stores into `5,000`-row chunks alongside linked HTML5 reset/project trackers for immediate field deployment.</li>
-            </ul>
-
-            <details>
-              <summary>Architecture, Tradeoffs &amp; Edge Cases Solved</summary>
-              <div class="details-body">
-                <p><strong>Pre-Flight Fail-Fast Validation:</strong> Verifies all 6 required upstream inputs exist before starting heavy Excel parsing, surfacing exact missing paths immediately rather than failing mid-pipeline.</p>
-                <p><strong>Rolling Window Alignment:</strong> Anchors field tracking joins to a deterministic `REPORT_DATE - 21 days` lookback window so weekly OOS snapshots stay synchronized with recent store visit history.</p>
-              </div>
-            </details>
-          </article>
-
-          <!-- Case Study 5: Statistical Analysis (Quartile Ranking) -->
-          <article class="case-card" data-category="stats">
-            <div class="case-meta">
-              <ul class="tag-list" aria-label="Technologies used">
-                <li class="tag">Non-Parametric Stats</li>
-                <li class="tag">Quartile Segmentation</li>
-                <li class="tag">Skewed Distributions</li>
-                <li class="tag">Python / Pandas</li>
-              </ul>
-              <a href="#case-studies">Statistical Ranking &rarr;</a>
-            </div>
-            <h3>5. Bivariate Store Sales &amp; Units Quartile Ranking (Skew-Resistant Segmentation)</h3>
-            <p class="case-summary">
-              Designed a joint percentile and quartile ranking model (<code>Joint_Store_Sales_Units_Quartile_Rank</code>) to segment thousands of retail locations by both dollar volume and unit velocity without distortion from extreme flagship outliers.
-            </p>
-            <ul class="impact-list">
-              <li><strong>Robustness to Heavy Tails:</strong> Retail store sales follow a right-skewed power law; rank-based quartiles prevented top 2% mega-stores from compressing 90% of locations into a single "low" bucket.</li>
-              <li><strong>Bivariate Tie-Breaking:</strong> Combined normalized percentile ranks across revenue and unit counts so high-velocity, lower-ticket locations still surface for stockout intervention.</li>
-            </ul>
-
-            <figure class="code-figure">
-              <figcaption id="code-quartile-stats">Composite percentile &amp; quartile scoring (Python / Pandas)</figcaption>
-              <pre role="region" aria-labelledby="code-quartile-stats" tabindex="0"><code>df["sales_pct"] = df["sales_usd"].rank(pct=True, method="average")
-df["units_pct"] = df["units_sold"].rank(pct=True, method="average")
-df["joint_score"] = 0.5 * df["sales_pct"] + 0.5 * df["units_pct"]
-df["quartile_rank"] = pd.qcut(
-    df["joint_score"], q=4, labels=["Q4 (Bottom)", "Q3", "Q2", "Q1 (Top)"]
-)</code></pre>
-            </figure>
-
-            <details>
-              <summary>Statistical Rationale &amp; Tradeoffs</summary>
-              <div class="details-body">
-                <p><strong>Why percentile ranks over z-scores?</strong> Z-scores assume approximate normality and are sensitive to extreme store outliers; rank-based percentiles preserve monotonic ordering and guarantee balanced operational tiers for field capacity planning.</p>
-              </div>
-            </details>
-          </article>
-
-          <!-- Case Study 6: Statistical Calibration & ROI -->
-          <article class="case-card" data-category="stats">
-            <div class="case-meta">
-              <ul class="tag-list" aria-label="Technologies used">
-                <li class="tag">Baseline Calibration</li>
-                <li class="tag">Lift &amp; ROI Attribution</li>
-                <li class="tag">Pre/Post Analysis</li>
-                <li class="tag">Variance Decomposition</li>
-              </ul>
-              <a href="#case-studies">Calibration &amp; ROI &rarr;</a>
-            </div>
-            <h3>6. Retail Partner Calibration Model &amp; Incremental ROI Attribution</h3>
-            <p class="case-summary">
-              Built a store-level calibration and pre/post lift framework to measure the true incremental impact of merchandising resets—controlling for baseline seasonality, store-tier mix, and out-of-stock duration.
-            </p>
-            <ul class="impact-list">
-              <li><strong>Matched-Cohort Baselines:</strong> Compared treated reset stores against matched non-reset control cohorts within the same volume quartile and region to isolate merchandising lift from macro seasonality.</li>
-              <li><strong>Variance Decomposition:</strong> Separated observed revenue deltas into timing/phasing effects vs. permanent velocity gains so leadership only scales programs with durable positive ROI.</li>
-            </ul>
-
-            <details>
-              <summary>Statistical Rationale &amp; Tradeoffs</summary>
-              <div class="details-body">
-                <p><strong>Preventing Selection Bias:</strong> Field teams naturally visit higher-performing stores first; stratifying calibration by pre-period quartile rank prevents overstating program ROI by attributing baseline store strength to the intervention.</p>
-              </div>
-            </details>
-          </article>
-        </div>
-      </section>
-
-      <section id="stack" aria-labelledby="stack-heading">
-        <div class="section-header">
-          <h2 id="stack-heading">Core Technical Capabilities</h2>
-        </div>
-        <div class="metrics-strip">
-          <div class="metric-card">
-            <strong>Python Data Engineering</strong>
-            <p class="metric-label">Pandas, NumPy, OpenPyXL, chunked streaming ETL, regex/GUID normalization, automated file validation.</p>
+      <div class="two-col">
+        <section class="panel" aria-labelledby="prod-grid-heading">
+          <div class="panel-header">
+            <h2 id="prod-grid-heading">Product &amp; Brand Performance (AG Grid)</h2>
+            <span class="pill" id="prod-count-badge">94 rows</span>
           </div>
-          <div class="metric-card">
-            <strong>SQL &amp; Analytics Modeling</strong>
-            <p class="metric-label">Window functions, deduplication, dimensional joins, quartile ranking, rolling time-window cohorts.</p>
+          <div id="product-grid" class="grid-box"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="reg-grid-heading">
+          <div class="panel-header">
+            <h2 id="reg-grid-heading">Regional Revenue &amp; Discount Leakage (AG Grid)</h2>
+            <span class="pill" id="reg-count-badge">32 rows</span>
           </div>
-          <div class="metric-card">
-            <strong>Operational Reporting &amp; BI</strong>
-            <p class="metric-label">Automated Excel/CSV pipelines, SharePoint/cloud ingestion, self-contained HTML5 operational trackers.</p>
+          <div id="region-grid" class="grid-box"></div>
+        </section>
+      </div>
+
+      <div class="two-col">
+        <section class="panel" aria-labelledby="cluster-heading">
+          <div class="panel-header">
+            <h2 id="cluster-heading">K-Means Customer Segments (k = 4, Silhouette = 0.5384)</h2>
+            <span class="pill">10,000 Unique Customers</span>
           </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Segment Persona</th>
+                <th class="num">Customers</th>
+                <th class="num">Mean Rev</th>
+                <th class="num">Mean Orders</th>
+                <th class="num">Units/Line</th>
+                <th class="num">Avg Disc</th>
+              </tr>
+            </thead>
+            <tbody id="cluster-tbody"></tbody>
+          </table>
+        </section>
+
+        <section class="panel" aria-labelledby="disc-heading">
+          <div class="panel-header">
+            <h2 id="disc-heading">Discount Tier Elasticity &amp; Margin Leakage</h2>
+            <span class="pill">$96.41M Total Leakage</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Discount Tier</th>
+                <th class="num">Order Lines</th>
+                <th class="num">Mean Qty (&plusmn;95% CI)</th>
+                <th class="num">Net Revenue</th>
+                <th class="num">Margin Leakage</th>
+              </tr>
+            </thead>
+            <tbody id="discount-tbody"></tbody>
+          </table>
+        </section>
+      </div>
+
+      <section class="panel" aria-labelledby="matplotlib-heading">
+        <div class="panel-header">
+          <h2 id="matplotlib-heading">Python / Matplotlib Statistical &amp; ML Visualizations</h2>
+          <span class="pill">Generated from 8,999,910 Rows</span>
+        </div>
+        <div class="chart-gallery">
+          <figure class="chart-fig">
+            <img src="images/regional_revenue_b2b_b2c.png" alt="Horizontal stacked bar chart of net revenue across 16 German states split by B2B and B2C" width="1760" height="1088" loading="lazy">
+            <figcaption><strong>Figure 1:</strong> Regional Net Revenue across 16 German states. Hamburg ($82.5M), Hessen ($78.4M), and Saarland ($78.4M) lead total volume.</figcaption>
+          </figure>
+          <figure class="chart-fig">
+            <img src="images/category_product_performance.png" alt="Two-panel bar chart showing revenue by beverage category and top 12 brands" width="2160" height="928" loading="lazy">
+            <figcaption><strong>Figure 2:</strong> Alcoholic Beverages drive 77.5% ($911.8M) of revenue despite equal unit volumes across categories, led by Veuve Clicquot and Moët &amp; Chandon.</figcaption>
+          </figure>
+          <figure class="chart-fig">
+            <img src="images/monthly_sales_trend.png" alt="Monthly time-series revenue trend from January 2021 to December 2023" width="1920" height="832" loading="lazy">
+            <figcaption><strong>Figure 3:</strong> 36-month revenue trajectory (2021–2023) demonstrating stable B2B wholesale baseline (~$25M/month) and seasonal Q3/Q4 peaks.</figcaption>
+          </figure>
+          <figure class="chart-fig">
+            <img src="images/discount_price_elasticity.png" alt="Bar charts comparing mean order quantity and discount leakage across 0%, 5%, 10%, and 15% discount tiers" width="2000" height="832" loading="lazy">
+            <figcaption><strong>Figure 4:</strong> Diminishing volume elasticity at 15% discount (+14.8% quantity vs. 10% tier, compared to +82.9% jump from 5% to 10%), identifying $28.7M in margin optimization target.</figcaption>
+          </figure>
+          <figure class="chart-fig">
+            <img src="images/elbow_silhouette_evaluation.png" alt="Line charts of WCSS Elbow curve and Silhouette Score for k=2 to 8" width="2000" height="800" loading="lazy">
+            <figcaption><strong>Figure 5:</strong> Unsupervised K-Means++ evaluation across k=2..8 using Within-Cluster Sum of Squares (WCSS) and Silhouette Coefficient (0.5384 at k=4).</figcaption>
+          </figure>
+          <figure class="chart-fig">
+            <img src="images/customer_segments_clusters.png" alt="Scatter plots of 10,000 customers by revenue vs basket size and 2D PCA projection" width="2160" height="896" loading="lazy">
+            <figcaption><strong>Figure 6:</strong> K-Means customer segments (n=10,000) in raw behavioral space and 2D PCA projection (99.55% variance explained).</figcaption>
+          </figure>
         </div>
       </section>
     </main>
-
-    <footer class="site-footer">
-      <span>Built with zero external JS dependencies &bull; Fast, accessible, and verifiable.</span>
-      <span><a href="README.md">View Repository README</a></span>
-    </footer>
   </div>
 
   <script>
-    document.querySelector(".filter-bar")?.addEventListener("click", event => {
-      const btn = event.target.closest("button[data-filter]");
-      if (!btn) return;
-      const filter = btn.dataset.filter;
+    const DATA = {"dataset": {"file_name": "synthetic_beverage_sales_data.csv", "file_size_mb": 752.7, "total_rows": 8999910, "total_orders": 3000000, "unique_customers": 10000, "unique_products": 47, "unique_categories": 4, "unique_regions": 16, "min_date": "2021-01-01", "max_date": "2023-12-30", "missing_counts": {"Order_ID": 0, "Customer_ID": 0, "Customer_Type": 0, "Product": 0, "Category": 0, "Unit_Price": 0, "Quantity": 0, "Discount": 0, "Total_Price": 0, "Region": 0, "Order_Date": 0}, "total_net_revenue": 1176681163.35, "total_gross_revenue": 1273091726.11, "total_discount_leakage": 96410562.76, "total_units_sold": 208241121, "avg_order_value": 392.23, "avg_line_value": 130.74}, "clustering": {"selected_k": 4, "wcss_by_k": {"2": 10329.57, "3": 6217.0, "4": 3904.25, "5": 2807.09, "6": 2148.24, "7": 1673.12, "8": 1427.69}, "silhouette_by_k": {"2": 0.7016, "3": 0.6052, "4": 0.5384, "5": 0.5029, "6": 0.4894, "7": 0.4912, "8": 0.4712}, "pca_variance_explained_pct": [74.49, 25.06], "clusters": [{"cluster_id": 0, "persona": "Cluster 1: High-Volume B2B Anchors", "customers": 1690, "mean_revenue": 265186.04, "mean_orders": 314.5, "mean_line_qty": 50.52, "mean_discount_pct": 8.35, "b2b_share_pct": 100.0}, {"cluster_id": 1, "persona": "Cluster 2: Growth Wholesale Accounts", "customers": 1873, "mean_revenue": 242101.01, "mean_orders": 286.9, "mean_line_qty": 50.52, "mean_discount_pct": 8.35, "b2b_share_pct": 100.0}, {"cluster_id": 2, "persona": "Cluster 3: High-Value Retail / Hybrid", "customers": 3280, "mean_revenue": 44702.43, "mean_orders": 313.5, "mean_line_qty": 8.0, "mean_discount_pct": 0.0, "b2b_share_pct": 0.0}, {"cluster_id": 3, "persona": "Cluster 4: Standard B2C Consumers", "customers": 3157, "mean_revenue": 40683.43, "mean_orders": 286.0, "mean_line_qty": 8.0, "mean_discount_pct": 0.0, "b2b_share_pct": 0.0}]}, "regions": [{"region": "Hamburg", "customer_type": "B2B", "revenue": 64006460.3, "gross": 70873050.72, "discount_leakage": 6866590.42, "units": 11281724, "lines": 223288, "orders": 74250}, {"region": "Hessen", "customer_type": "B2B", "revenue": 62515292.28, "gross": 69172742.53, "discount_leakage": 6657450.25, "units": 11006591, "lines": 217616, "orders": 72514}, {"region": "Saarland", "customer_type": "B2B", "revenue": 61146372.5, "gross": 67687973.48, "discount_leakage": 6541600.98, "units": 10921966, "lines": 216483, "orders": 72271}, {"region": "Mecklenburg-Vorpommern", "customer_type": "B2B", "revenue": 59473176.98, "gross": 65837582.02, "discount_leakage": 6364405.04, "units": 10559429, "lines": 209093, "orders": 69723}, {"region": "Rheinland-Pfalz", "customer_type": "B2B", "revenue": 58765267.7, "gross": 65074069.69, "discount_leakage": 6308801.99, "units": 10660041, "lines": 211034, "orders": 70267}, {"region": "Thüringen", "customer_type": "B2B", "revenue": 57964709.02, "gross": 64142553.76, "discount_leakage": 6177844.74, "units": 10179209, "lines": 201538, "orders": 67516}, {"region": "Berlin", "customer_type": "B2B", "revenue": 57836081.49, "gross": 64001811.61, "discount_leakage": 6165730.12, "units": 10087675, "lines": 199671, "orders": 66822}, {"region": "Bayern", "customer_type": "B2B", "revenue": 55383162.54, "gross": 61316889.57, "discount_leakage": 5933727.03, "units": 9784414, "lines": 193556, "orders": 64462}, {"region": "Brandenburg", "customer_type": "B2B", "revenue": 55025039.49, "gross": 60903931.39, "discount_leakage": 5878891.9, "units": 9653513, "lines": 190994, "orders": 63674}, {"region": "Baden-Württemberg", "customer_type": "B2B", "revenue": 54148868.94, "gross": 59941262.72, "discount_leakage": 5792393.78, "units": 9622702, "lines": 190507, "orders": 63540}, {"region": "Nordrhein-Westfalen", "customer_type": "B2B", "revenue": 53765860.2, "gross": 59508729.37, "discount_leakage": 5742869.17, "units": 9784646, "lines": 193457, "orders": 64593}, {"region": "Sachsen", "customer_type": "B2B", "revenue": 53532387.82, "gross": 59260887.88, "discount_leakage": 5728500.06, "units": 9583947, "lines": 189763, "orders": 63124}, {"region": "Niedersachsen", "customer_type": "B2B", "revenue": 53165902.62, "gross": 58864757.59, "discount_leakage": 5698854.97, "units": 9420151, "lines": 186351, "orders": 62170}, {"region": "Sachsen-Anhalt", "customer_type": "B2B", "revenue": 53024492.06, "gross": 58713720.52, "discount_leakage": 5689228.46, "units": 9705050, "lines": 192346, "orders": 63997}, {"region": "Schleswig-Holstein", "customer_type": "B2B", "revenue": 52128139.68, "gross": 57688266.75, "discount_leakage": 5560127.07, "units": 9357908, "lines": 185343, "orders": 61928}, {"region": "Bremen", "customer_type": "B2B", "revenue": 49738398.65, "gross": 55041945.43, "discount_leakage": 5303546.78, "units": 10271591, "lines": 203465, "orders": 67957}, {"region": "Niedersachsen", "customer_type": "B2C", "revenue": 18793147.9, "gross": 18793147.9, "discount_leakage": 0.0, "units": 3125510, "lines": 390654, "orders": 130128}, {"region": "Hamburg", "customer_type": "B2C", "revenue": 18464311.68, "gross": 18464311.68, "discount_leakage": 0.0, "units": 3045847, "lines": 380766, "orders": 127207}, {"region": "Sachsen", "customer_type": "B2C", "revenue": 18414603.56, "gross": 18414603.56, "discount_leakage": 0.0, "units": 3062587, "lines": 383064, "orders": 127689}, {"region": "Schleswig-Holstein", "customer_type": "B2C", "revenue": 18189689.7, "gross": 18189689.7, "discount_leakage": 0.0, "units": 3044151, "lines": 380482, "orders": 126757}, {"region": "Nordrhein-Westfalen", "customer_type": "B2C", "revenue": 17627943.5, "gross": 17627943.5, "discount_leakage": 0.0, "units": 3002003, "lines": 375340, "orders": 125126}, {"region": "Baden-Württemberg", "customer_type": "B2C", "revenue": 17445969.96, "gross": 17445969.96, "discount_leakage": 0.0, "units": 2901968, "lines": 362998, "orders": 120673}, {"region": "Bayern", "customer_type": "B2C", "revenue": 17442236.64, "gross": 17442236.64, "discount_leakage": 0.0, "units": 2895075, "lines": 362513, "orders": 120890}, {"region": "Thüringen", "customer_type": "B2C", "revenue": 17360156.45, "gross": 17360156.45, "discount_leakage": 0.0, "units": 2889150, "lines": 361016, "orders": 120343}, {"region": "Saarland", "customer_type": "B2C", "revenue": 17244214.65, "gross": 17244214.65, "discount_leakage": 0.0, "units": 2863122, "lines": 357113, "orders": 119002}, {"region": "Rheinland-Pfalz", "customer_type": "B2C", "revenue": 17073409.29, "gross": 17073409.29, "discount_leakage": 0.0, "units": 2936734, "lines": 366933, "orders": 122420}, {"region": "Sachsen-Anhalt", "customer_type": "B2C", "revenue": 16741051.56, "gross": 16741051.56, "discount_leakage": 0.0, "units": 2834614, "lines": 354124, "orders": 118094}, {"region": "Berlin", "customer_type": "B2C", "revenue": 16731846.04, "gross": 16731846.04, "discount_leakage": 0.0, "units": 2781721, "lines": 347734, "orders": 115747}, {"region": "Brandenburg", "customer_type": "B2C", "revenue": 16323991.62, "gross": 16323991.62, "discount_leakage": 0.0, "units": 2740400, "lines": 342458, "orders": 113942}, {"region": "Mecklenburg-Vorpommern", "customer_type": "B2C", "revenue": 16044070.18, "gross": 16044070.18, "discount_leakage": 0.0, "units": 2685529, "lines": 335843, "orders": 111914}, {"region": "Hessen", "customer_type": "B2C", "revenue": 15884817.91, "gross": 15884817.91, "discount_leakage": 0.0, "units": 2637419, "lines": 329609, "orders": 109829}, {"region": "Bremen", "customer_type": "B2C", "revenue": 15280090.44, "gross": 15280090.44, "discount_leakage": 0.0, "units": 2914734, "lines": 364758, "orders": 121431}], "categories": [{"category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 697888317.54, "gross": 772654499.88, "units": 40501724, "lines": 801573}, {"category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 213909602.18, "gross": 213909602.18, "units": 11607917, "lines": 1450052}, {"category": "Juices", "customer_type": "B2B", "revenue": 101870692.21, "gross": 112672935.03, "units": 40448528, "lines": 800637}, {"category": "Soft Drinks", "customer_type": "B2B", "revenue": 64350493.19, "gross": 71176288.05, "units": 40432538, "lines": 800715}, {"category": "Water", "customer_type": "B2B", "revenue": 37510109.33, "gross": 41526452.07, "units": 40497767, "lines": 801580}, {"category": "Juices", "customer_type": "B2C", "revenue": 31297156.43, "gross": 31297156.43, "units": 11598346, "lines": 1449300}, {"category": "Soft Drinks", "customer_type": "B2C", "revenue": 18452049.34, "gross": 18452049.34, "units": 11571172, "lines": 1447416}, {"category": "Water", "customer_type": "B2C", "revenue": 11402743.13, "gross": 11402743.13, "units": 11583129, "lines": 1448637}], "products": [{"product": "Moët & Chandon", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 139543793.08, "gross": 154528919.92, "discount_leakage": 14985126.84, "units": 2057390, "lines": 40771, "avg_unit_price": 67.45, "avg_discount_pct": 8.36}, {"product": "Veuve Clicquot", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 137528583.63, "gross": 152280045.59, "discount_leakage": 14751461.96, "units": 2057712, "lines": 40721, "avg_unit_price": 66.44, "avg_discount_pct": 8.36}, {"product": "Johnnie Walker", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 75422676.32, "gross": 83513187.87, "discount_leakage": 8090511.55, "units": 2057768, "lines": 40626, "avg_unit_price": 37.2, "avg_discount_pct": 8.36}, {"product": "Jack Daniels", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 66066217.37, "gross": 73105833.91, "discount_leakage": 7039616.54, "units": 2075770, "lines": 41221, "avg_unit_price": 32.29, "avg_discount_pct": 8.33}, {"product": "Tanqueray", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 65537046.29, "gross": 72541068.14, "discount_leakage": 7004021.85, "units": 2056056, "lines": 40860, "avg_unit_price": 32.33, "avg_discount_pct": 8.37}, {"product": "Veuve Clicquot", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 65053314.79, "gross": 65053314.79, "discount_leakage": 0.0, "units": 595766, "lines": 74143, "avg_unit_price": 109.2, "avg_discount_pct": 0.0}, {"product": "Havana Club", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 50321111.7, "gross": 55723778.54, "discount_leakage": 5402666.84, "units": 2067286, "lines": 40997, "avg_unit_price": 24.45, "avg_discount_pct": 8.35}, {"product": "Bacardi", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 50282108.43, "gross": 55665180.26, "discount_leakage": 5383071.83, "units": 2065540, "lines": 40923, "avg_unit_price": 24.47, "avg_discount_pct": 8.35}, {"product": "Moët & Chandon", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 35544293.13, "gross": 35544293.13, "discount_leakage": 0.0, "units": 594209, "lines": 74136, "avg_unit_price": 59.83, "avg_discount_pct": 0.0}, {"product": "Jack Daniels", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 29814785.5, "gross": 29814785.5, "discount_leakage": 0.0, "units": 593149, "lines": 74122, "avg_unit_price": 50.27, "avg_discount_pct": 0.0}, {"product": "Johnnie Walker", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 21839124.58, "gross": 21839124.58, "discount_leakage": 0.0, "units": 596816, "lines": 74459, "avg_unit_price": 36.59, "avg_discount_pct": 0.0}, {"product": "Tanqueray", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 20606609.3, "gross": 20606609.3, "discount_leakage": 0.0, "units": 595231, "lines": 74329, "avg_unit_price": 34.62, "avg_discount_pct": 0.0}, {"product": "Riesling", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 19929135.82, "gross": 22066534.13, "discount_leakage": 2137398.31, "units": 2243598, "lines": 44444, "avg_unit_price": 8.84, "avg_discount_pct": 8.36}, {"product": "Chardonnay", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 18193598.54, "gross": 20139110.34, "discount_leakage": 1945511.8, "units": 2082551, "lines": 41097, "avg_unit_price": 8.68, "avg_discount_pct": 8.33}, {"product": "Sauvignon Blanc", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 18080394.68, "gross": 20021398.74, "discount_leakage": 1941004.06, "units": 2071162, "lines": 41078, "avg_unit_price": 8.67, "avg_discount_pct": 8.36}, {"product": "Merlot", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 18026663.61, "gross": 19959559.64, "discount_leakage": 1932896.03, "units": 2069862, "lines": 40877, "avg_unit_price": 8.66, "avg_discount_pct": 8.34}, {"product": "Cranberry Juice", "category": "Juices", "customer_type": "B2B", "revenue": 17184245.57, "gross": 18995842.43, "discount_leakage": 1811596.86, "units": 5736229, "lines": 113669, "avg_unit_price": 3.13, "avg_discount_pct": 8.32}, {"product": "Passion Fruit Juice", "category": "Juices", "customer_type": "B2B", "revenue": 17183869.55, "gross": 19003459.93, "discount_leakage": 1819590.38, "units": 5730140, "lines": 113502, "avg_unit_price": 3.13, "avg_discount_pct": 8.35}, {"product": "Mango Juice", "category": "Juices", "customer_type": "B2B", "revenue": 17122093.1, "gross": 18932014.09, "discount_leakage": 1809920.99, "units": 5709074, "lines": 113100, "avg_unit_price": 3.13, "avg_discount_pct": 8.34}, {"product": "Rotkäppchen Sekt", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 14582904.57, "gross": 16138105.9, "discount_leakage": 1555201.33, "units": 2288523, "lines": 45138, "avg_unit_price": 6.47, "avg_discount_pct": 8.34}, {"product": "Tomato Juice", "category": "Juices", "customer_type": "B2B", "revenue": 14310122.93, "gross": 15830805.34, "discount_leakage": 1520682.41, "units": 5759226, "lines": 113947, "avg_unit_price": 2.57, "avg_discount_pct": 8.35}, {"product": "Rauch Multivitamin", "category": "Juices", "customer_type": "B2B", "revenue": 14194686.36, "gross": 15706395.86, "discount_leakage": 1511709.5, "units": 5717064, "lines": 113080, "avg_unit_price": 2.57, "avg_discount_pct": 8.38}, {"product": "Hohes C Orange", "category": "Juices", "customer_type": "B2B", "revenue": 11909201.55, "gross": 13177833.01, "discount_leakage": 1268631.46, "units": 6053306, "lines": 119679, "avg_unit_price": 2.01, "avg_discount_pct": 8.35}, {"product": "Granini Apple", "category": "Juices", "customer_type": "B2B", "revenue": 9966473.15, "gross": 11026584.37, "discount_leakage": 1060111.22, "units": 5743489, "lines": 113660, "avg_unit_price": 1.79, "avg_discount_pct": 8.35}, {"product": "Fritz-Kola", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 9269559.94, "gross": 10245878.03, "discount_leakage": 976318.09, "units": 4003116, "lines": 79363, "avg_unit_price": 2.45, "avg_discount_pct": 8.33}, {"product": "Red Bull", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 8470717.69, "gross": 9370830.0, "discount_leakage": 900112.31, "units": 3242978, "lines": 64063, "avg_unit_price": 2.71, "avg_discount_pct": 8.36}, {"product": "Rockstar", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 8397153.49, "gross": 9288016.27, "discount_leakage": 890862.78, "units": 3223869, "lines": 63779, "avg_unit_price": 2.7, "avg_discount_pct": 8.35}, {"product": "Monster", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 8370947.18, "gross": 9258351.19, "discount_leakage": 887404.01, "units": 3206788, "lines": 63617, "avg_unit_price": 2.7, "avg_discount_pct": 8.32}, {"product": "Bacardi", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 8185395.94, "gross": 8185395.94, "discount_leakage": 0.0, "units": 591199, "lines": 74045, "avg_unit_price": 13.85, "avg_discount_pct": 0.0}, {"product": "Havana Club", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 7725852.54, "gross": 7725852.54, "discount_leakage": 0.0, "units": 595899, "lines": 74435, "avg_unit_price": 12.96, "avg_discount_pct": 0.0}, {"product": "Club Mate", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 6483816.83, "gross": 7166805.91, "discount_leakage": 682989.08, "units": 3219581, "lines": 63843, "avg_unit_price": 2.13, "avg_discount_pct": 8.34}, {"product": "Cranberry Juice", "category": "Juices", "customer_type": "B2C", "revenue": 5860585.41, "gross": 5860585.41, "discount_leakage": 0.0, "units": 1644612, "lines": 205659, "avg_unit_price": 3.56, "avg_discount_pct": 0.0}, {"product": "Tomato Juice", "category": "Juices", "customer_type": "B2C", "revenue": 5448523.19, "gross": 5448523.19, "discount_leakage": 0.0, "units": 1636103, "lines": 204826, "avg_unit_price": 3.33, "avg_discount_pct": 0.0}, {"product": "Volvic Touch", "category": "Water", "customer_type": "B2B", "revenue": 5441129.65, "gross": 6023442.06, "discount_leakage": 582312.41, "units": 4464259, "lines": 88466, "avg_unit_price": 1.22, "avg_discount_pct": 8.34}, {"product": "Vio Wasser", "category": "Water", "customer_type": "B2B", "revenue": 5436488.44, "gross": 6018390.91, "discount_leakage": 581902.47, "units": 4469324, "lines": 88319, "avg_unit_price": 1.22, "avg_discount_pct": 8.35}, {"product": "Rotkäppchen Sekt", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 5401696.69, "gross": 5401696.69, "discount_leakage": -0.0, "units": 651322, "lines": 81438, "avg_unit_price": 8.29, "avg_discount_pct": 0.0}, {"product": "Mango Juice", "category": "Juices", "customer_type": "B2C", "revenue": 5269840.09, "gross": 5269840.09, "discount_leakage": 0.0, "units": 1640034, "lines": 204664, "avg_unit_price": 3.21, "avg_discount_pct": 0.0}, {"product": "Sauvignon Blanc", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 5238780.38, "gross": 5238780.38, "discount_leakage": 0.0, "units": 593364, "lines": 74072, "avg_unit_price": 8.83, "avg_discount_pct": 0.0}, {"product": "Evian", "category": "Water", "customer_type": "B2B", "revenue": 5054101.69, "gross": 5592831.08, "discount_leakage": 538729.39, "units": 4460458, "lines": 88351, "avg_unit_price": 1.16, "avg_discount_pct": 8.35}, {"product": "Passion Fruit Juice", "category": "Juices", "customer_type": "B2C", "revenue": 4959277.13, "gross": 4959277.13, "discount_leakage": 0.0, "units": 1642180, "lines": 205421, "avg_unit_price": 3.02, "avg_discount_pct": 0.0}, {"product": "Erdinger Weißbier", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 4230201.84, "gross": 4681313.87, "discount_leakage": 451112.03, "units": 2101904, "lines": 41893, "avg_unit_price": 2.05, "avg_discount_pct": 8.34}, {"product": "Augustiner", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 4089199.04, "gross": 4527947.84, "discount_leakage": 438748.8, "units": 2075166, "lines": 41087, "avg_unit_price": 2.01, "avg_discount_pct": 8.38}, {"product": "San Pellegrino", "category": "Water", "customer_type": "B2B", "revenue": 4019964.43, "gross": 4451568.53, "discount_leakage": 431604.1, "units": 4616810, "lines": 91428, "avg_unit_price": 0.87, "avg_discount_pct": 8.36}, {"product": "Selters", "category": "Water", "customer_type": "B2B", "revenue": 3922808.84, "gross": 4344700.01, "discount_leakage": 421891.17, "units": 4500444, "lines": 88843, "avg_unit_price": 0.87, "avg_discount_pct": 8.37}, {"product": "Rauch Multivitamin", "category": "Juices", "customer_type": "B2C", "revenue": 3914739.15, "gross": 3914739.15, "discount_leakage": 0.0, "units": 1644811, "lines": 205458, "avg_unit_price": 2.38, "avg_discount_pct": 0.0}, {"product": "Apollinaris", "category": "Water", "customer_type": "B2B", "revenue": 3910366.27, "gross": 4330683.64, "discount_leakage": 420317.37, "units": 4491986, "lines": 88863, "avg_unit_price": 0.87, "avg_discount_pct": 8.36}, {"product": "Gerolsteiner", "category": "Water", "customer_type": "B2B", "revenue": 3864246.26, "gross": 4278282.41, "discount_leakage": 414036.15, "units": 4428211, "lines": 87871, "avg_unit_price": 0.87, "avg_discount_pct": 8.34}, {"product": "Beck's", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 3655629.34, "gross": 4044221.3, "discount_leakage": 388591.96, "units": 2567411, "lines": 50699, "avg_unit_price": 1.47, "avg_discount_pct": 8.34}, {"product": "Coca-Cola", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 3605904.74, "gross": 3988854.9, "discount_leakage": 382950.16, "units": 3577987, "lines": 70845, "avg_unit_price": 1.03, "avg_discount_pct": 8.34}, {"product": "Kölsch", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 3540358.19, "gross": 3916660.54, "discount_leakage": 376302.35, "units": 2184695, "lines": 43283, "avg_unit_price": 1.65, "avg_discount_pct": 8.32}, {"product": "Sprite", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 3536692.6, "gross": 3913596.48, "discount_leakage": 376903.88, "units": 3582115, "lines": 70914, "avg_unit_price": 1.01, "avg_discount_pct": 8.35}, {"product": "Fanta", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 3436784.4, "gross": 3803669.14, "discount_leakage": 366884.74, "units": 3493576, "lines": 69439, "avg_unit_price": 1.0, "avg_discount_pct": 8.35}, {"product": "Pepsi", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 3265838.33, "gross": 3613785.73, "discount_leakage": 347947.4, "units": 3228551, "lines": 63875, "avg_unit_price": 1.03, "avg_discount_pct": 8.34}, {"product": "Schwip Schwap", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 3191071.54, "gross": 3531152.87, "discount_leakage": 340081.33, "units": 3240423, "lines": 63911, "avg_unit_price": 1.01, "avg_discount_pct": 8.36}, {"product": "Mountain Dew", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 3164042.0, "gross": 3501124.04, "discount_leakage": 337082.04, "units": 3207980, "lines": 63611, "avg_unit_price": 1.01, "avg_discount_pct": 8.35}, {"product": "Mezzo Mix", "category": "Soft Drinks", "customer_type": "B2B", "revenue": 3157964.45, "gross": 3494223.49, "discount_leakage": 336259.04, "units": 3205574, "lines": 63455, "avg_unit_price": 1.01, "avg_discount_pct": 8.33}, {"product": "Hohes C Orange", "category": "Juices", "customer_type": "B2C", "revenue": 3139015.44, "gross": 3139015.44, "discount_leakage": 0.0, "units": 1740883, "lines": 217435, "avg_unit_price": 1.8, "avg_discount_pct": 0.0}, {"product": "Vittel", "category": "Water", "customer_type": "B2B", "revenue": 3014488.86, "gross": 3335797.1, "discount_leakage": 321308.24, "units": 4607034, "lines": 91121, "avg_unit_price": 0.66, "avg_discount_pct": 8.34}, {"product": "Jever", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 2997482.79, "gross": 3317036.24, "discount_leakage": 319553.45, "units": 2154965, "lines": 42388, "avg_unit_price": 1.43, "avg_discount_pct": 8.37}, {"product": "Monster", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 2968035.34, "gross": 2968035.34, "discount_leakage": 0.0, "units": 923634, "lines": 115845, "avg_unit_price": 3.21, "avg_discount_pct": 0.0}, {"product": "Krombacher", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 2948717.42, "gross": 3261751.42, "discount_leakage": 313034.0, "units": 2124800, "lines": 41897, "avg_unit_price": 1.43, "avg_discount_pct": 8.35}, {"product": "Warsteiner", "category": "Alcoholic Beverages", "customer_type": "B2B", "revenue": 2912494.88, "gross": 3222845.69, "discount_leakage": 310350.81, "units": 2099565, "lines": 41573, "avg_unit_price": 1.43, "avg_discount_pct": 8.38}, {"product": "Chardonnay", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 2891299.7, "gross": 2891299.7, "discount_leakage": 0.0, "units": 592092, "lines": 74129, "avg_unit_price": 4.88, "avg_discount_pct": 0.0}, {"product": "Volvic", "category": "Water", "customer_type": "B2B", "revenue": 2846514.89, "gross": 3150756.33, "discount_leakage": 304241.44, "units": 4459241, "lines": 88318, "avg_unit_price": 0.65, "avg_discount_pct": 8.36}, {"product": "Riesling", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 2732144.82, "gross": 2732144.82, "discount_leakage": 0.0, "units": 640749, "lines": 80113, "avg_unit_price": 4.26, "avg_discount_pct": 0.0}, {"product": "Granini Apple", "category": "Juices", "customer_type": "B2C", "revenue": 2705176.02, "gross": 2705176.02, "discount_leakage": 0.0, "units": 1649723, "lines": 205837, "avg_unit_price": 1.64, "avg_discount_pct": 0.0}, {"product": "Merlot", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 2571727.29, "gross": 2571727.29, "discount_leakage": 0.0, "units": 591146, "lines": 73915, "avg_unit_price": 4.35, "avg_discount_pct": 0.0}, {"product": "Fritz-Kola", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 2331614.99, "gross": 2331614.99, "discount_leakage": 0.0, "units": 1135622, "lines": 141895, "avg_unit_price": 2.05, "avg_discount_pct": 0.0}, {"product": "Vio Wasser", "category": "Water", "customer_type": "B2C", "revenue": 2124510.71, "gross": 2124510.71, "discount_leakage": 0.0, "units": 1280031, "lines": 159976, "avg_unit_price": 1.66, "avg_discount_pct": 0.0}, {"product": "Red Bull", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 2112205.08, "gross": 2112205.08, "discount_leakage": 0.0, "units": 925009, "lines": 115685, "avg_unit_price": 2.28, "avg_discount_pct": 0.0}, {"product": "Rockstar", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 2087138.56, "gross": 2087138.56, "discount_leakage": 0.0, "units": 918079, "lines": 114934, "avg_unit_price": 2.27, "avg_discount_pct": 0.0}, {"product": "Club Mate", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 2030382.57, "gross": 2030382.57, "discount_leakage": -0.0, "units": 925728, "lines": 115654, "avg_unit_price": 2.19, "avg_discount_pct": 0.0}, {"product": "Volvic Touch", "category": "Water", "customer_type": "B2C", "revenue": 1825469.86, "gross": 1825469.86, "discount_leakage": -0.0, "units": 1285513, "lines": 160501, "avg_unit_price": 1.42, "avg_discount_pct": 0.0}, {"product": "Evian", "category": "Water", "customer_type": "B2C", "revenue": 1627727.93, "gross": 1627727.93, "discount_leakage": 0.0, "units": 1285161, "lines": 160553, "avg_unit_price": 1.27, "avg_discount_pct": 0.0}, {"product": "Pepsi", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 1448587.16, "gross": 1448587.16, "discount_leakage": 0.0, "units": 921651, "lines": 115319, "avg_unit_price": 1.57, "avg_discount_pct": 0.0}, {"product": "Gerolsteiner", "category": "Water", "customer_type": "B2C", "revenue": 1327582.09, "gross": 1327582.09, "discount_leakage": 0.0, "units": 1276538, "lines": 159901, "avg_unit_price": 1.04, "avg_discount_pct": 0.0}, {"product": "Erdinger Weißbier", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 1230978.06, "gross": 1230978.06, "discount_leakage": 0.0, "units": 606419, "lines": 75611, "avg_unit_price": 2.03, "avg_discount_pct": 0.0}, {"product": "Apollinaris", "category": "Water", "customer_type": "B2C", "revenue": 1227373.47, "gross": 1227373.47, "discount_leakage": 0.0, "units": 1278584, "lines": 159779, "avg_unit_price": 0.96, "avg_discount_pct": 0.0}, {"product": "Fanta", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 1204527.42, "gross": 1204527.42, "discount_leakage": 0.0, "units": 1009452, "lines": 126200, "avg_unit_price": 1.19, "avg_discount_pct": 0.0}, {"product": "Jever", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 1199547.39, "gross": 1199547.39, "discount_leakage": 0.0, "units": 619379, "lines": 77228, "avg_unit_price": 1.94, "avg_discount_pct": 0.0}, {"product": "San Pellegrino", "category": "Water", "customer_type": "B2C", "revenue": 1168440.8, "gross": 1168440.8, "discount_leakage": 0.0, "units": 1317909, "lines": 164640, "avg_unit_price": 0.89, "avg_discount_pct": 0.0}, {"product": "Schwip Schwap", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 1145310.47, "gross": 1145310.47, "discount_leakage": 0.0, "units": 926172, "lines": 115904, "avg_unit_price": 1.24, "avg_discount_pct": 0.0}, {"product": "Coca-Cola", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 1117993.56, "gross": 1117993.56, "discount_leakage": 0.0, "units": 1019328, "lines": 127410, "avg_unit_price": 1.1, "avg_discount_pct": 0.0}, {"product": "Beck's", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 1019898.41, "gross": 1019898.41, "discount_leakage": 0.0, "units": 726064, "lines": 90730, "avg_unit_price": 1.4, "avg_discount_pct": 0.0}, {"product": "Krombacher", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 948461.69, "gross": 948461.69, "discount_leakage": 0.0, "units": 597813, "lines": 75050, "avg_unit_price": 1.59, "avg_discount_pct": 0.0}, {"product": "Mountain Dew", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 884176.8, "gross": 884176.8, "discount_leakage": 0.0, "units": 921000, "lines": 115104, "avg_unit_price": 0.96, "avg_discount_pct": 0.0}, {"product": "Vittel", "category": "Water", "customer_type": "B2C", "revenue": 777491.04, "gross": 777491.04, "discount_leakage": 0.0, "units": 1314052, "lines": 164669, "avg_unit_price": 0.59, "avg_discount_pct": 0.0}, {"product": "Volvic", "category": "Water", "customer_type": "B2C", "revenue": 724874.58, "gross": 724874.58, "discount_leakage": -0.0, "units": 1279238, "lines": 160151, "avg_unit_price": 0.57, "avg_discount_pct": 0.0}, {"product": "Augustiner", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 666863.48, "gross": 666863.48, "discount_leakage": 0.0, "units": 593671, "lines": 74088, "avg_unit_price": 1.12, "avg_discount_pct": 0.0}, {"product": "Warsteiner", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 635912.73, "gross": 635912.73, "discount_leakage": 0.0, "units": 605660, "lines": 75545, "avg_unit_price": 1.05, "avg_discount_pct": 0.0}, {"product": "Kölsch", "category": "Alcoholic Beverages", "customer_type": "B2C", "revenue": 602915.76, "gross": 602915.76, "discount_leakage": 0.0, "units": 627969, "lines": 78464, "avg_unit_price": 0.96, "avg_discount_pct": 0.0}, {"product": "Selters", "category": "Water", "customer_type": "B2C", "revenue": 599272.65, "gross": 599272.65, "discount_leakage": 0.0, "units": 1266103, "lines": 158467, "avg_unit_price": 0.47, "avg_discount_pct": 0.0}, {"product": "Mezzo Mix", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 563775.87, "gross": 563775.87, "discount_leakage": 0.0, "units": 924235, "lines": 115533, "avg_unit_price": 0.61, "avg_discount_pct": 0.0}, {"product": "Sprite", "category": "Soft Drinks", "customer_type": "B2C", "revenue": 558301.52, "gross": 558301.52, "discount_leakage": 0.0, "units": 1021262, "lines": 127933, "avg_unit_price": 0.55, "avg_discount_pct": 0.0}], "monthly": [{"year_month": "2021-01", "customer_type": "B2B", "revenue": 24949102.52, "units": 4519619, "lines": 89612}, {"year_month": "2021-01", "customer_type": "B2C", "revenue": 7476326.56, "units": 1318146, "lines": 164995}, {"year_month": "2021-02", "customer_type": "B2B", "revenue": 22266405.15, "units": 4108938, "lines": 81321}, {"year_month": "2021-02", "customer_type": "B2C", "revenue": 6843763.99, "units": 1189756, "lines": 148862}, {"year_month": "2021-03", "customer_type": "B2B", "revenue": 25375774.04, "units": 4584449, "lines": 90788}, {"year_month": "2021-03", "customer_type": "B2C", "revenue": 7581662.46, "units": 1313880, "lines": 164567}, {"year_month": "2021-04", "customer_type": "B2B", "revenue": 23855248.76, "units": 4414316, "lines": 87675}, {"year_month": "2021-04", "customer_type": "B2C", "revenue": 7286809.88, "units": 1264989, "lines": 157709}, {"year_month": "2021-05", "customer_type": "B2B", "revenue": 24223342.9, "units": 4563546, "lines": 90169}, {"year_month": "2021-05", "customer_type": "B2C", "revenue": 7632147.22, "units": 1327695, "lines": 165836}, {"year_month": "2021-06", "customer_type": "B2B", "revenue": 23693435.92, "units": 4445922, "lines": 88196}, {"year_month": "2021-06", "customer_type": "B2C", "revenue": 7299851.44, "units": 1263738, "lines": 158054}, {"year_month": "2021-07", "customer_type": "B2B", "revenue": 24430253.34, "units": 4558442, "lines": 90323}, {"year_month": "2021-07", "customer_type": "B2C", "revenue": 7681806.0, "units": 1312919, "lines": 164177}, {"year_month": "2021-08", "customer_type": "B2B", "revenue": 24372693.13, "units": 4533387, "lines": 89794}, {"year_month": "2021-08", "customer_type": "B2C", "revenue": 7552906.18, "units": 1312232, "lines": 163739}, {"year_month": "2021-09", "customer_type": "B2B", "revenue": 23790285.25, "units": 4396909, "lines": 87000}, {"year_month": "2021-09", "customer_type": "B2C", "revenue": 7447382.92, "units": 1278505, "lines": 159453}, {"year_month": "2021-10", "customer_type": "B2B", "revenue": 24359371.29, "units": 4588179, "lines": 90692}, {"year_month": "2021-10", "customer_type": "B2C", "revenue": 7508357.52, "units": 1318867, "lines": 165096}, {"year_month": "2021-11", "customer_type": "B2B", "revenue": 23624110.67, "units": 4451528, "lines": 88057}, {"year_month": "2021-11", "customer_type": "B2C", "revenue": 7353305.32, "units": 1269251, "lines": 158792}, {"year_month": "2021-12", "customer_type": "B2B", "revenue": 25756326.28, "units": 4567637, "lines": 90344}, {"year_month": "2021-12", "customer_type": "B2C", "revenue": 7685978.18, "units": 1302436, "lines": 162705}, {"year_month": "2022-01", "customer_type": "B2B", "revenue": 25091754.98, "units": 4567601, "lines": 90328}, {"year_month": "2022-01", "customer_type": "B2C", "revenue": 7743085.22, "units": 1314925, "lines": 164560}, {"year_month": "2022-02", "customer_type": "B2B", "revenue": 23301015.39, "units": 4137057, "lines": 82188}, {"year_month": "2022-02", "customer_type": "B2C", "revenue": 6923874.01, "units": 1176961, "lines": 146898}, {"year_month": "2022-03", "customer_type": "B2B", "revenue": 26142205.25, "units": 4640459, "lines": 91814}, {"year_month": "2022-03", "customer_type": "B2C", "revenue": 7661124.76, "units": 1314501, "lines": 164108}, {"year_month": "2022-04", "customer_type": "B2B", "revenue": 24803494.41, "units": 4471093, "lines": 88563}, {"year_month": "2022-04", "customer_type": "B2C", "revenue": 7581244.37, "units": 1274144, "lines": 159303}, {"year_month": "2022-05", "customer_type": "B2B", "revenue": 25500420.46, "units": 4654261, "lines": 91938}, {"year_month": "2022-05", "customer_type": "B2C", "revenue": 7767736.11, "units": 1320634, "lines": 165180}, {"year_month": "2022-06", "customer_type": "B2B", "revenue": 25001739.34, "units": 4481044, "lines": 88660}, {"year_month": "2022-06", "customer_type": "B2C", "revenue": 7548788.65, "units": 1273253, "lines": 159044}, {"year_month": "2022-07", "customer_type": "B2B", "revenue": 25660471.7, "units": 4584752, "lines": 90992}, {"year_month": "2022-07", "customer_type": "B2C", "revenue": 7741451.52, "units": 1308232, "lines": 163286}, {"year_month": "2022-08", "customer_type": "B2B", "revenue": 25633609.32, "units": 4630347, "lines": 91586}, {"year_month": "2022-08", "customer_type": "B2C", "revenue": 7881558.12, "units": 1315318, "lines": 164069}, {"year_month": "2022-09", "customer_type": "B2B", "revenue": 25046274.59, "units": 4471030, "lines": 88197}, {"year_month": "2022-09", "customer_type": "B2C", "revenue": 7457381.96, "units": 1267873, "lines": 158486}, {"year_month": "2022-10", "customer_type": "B2B", "revenue": 25737455.52, "units": 4625539, "lines": 91435}, {"year_month": "2022-10", "customer_type": "B2C", "revenue": 7799138.81, "units": 1317569, "lines": 164789}, {"year_month": "2022-11", "customer_type": "B2B", "revenue": 24793433.59, "units": 4430776, "lines": 87633}, {"year_month": "2022-11", "customer_type": "B2C", "revenue": 7586361.05, "units": 1267188, "lines": 158530}, {"year_month": "2022-12", "customer_type": "B2B", "revenue": 26383927.74, "units": 4582562, "lines": 90675}, {"year_month": "2022-12", "customer_type": "B2C", "revenue": 8072233.21, "units": 1320525, "lines": 165035}, {"year_month": "2023-01", "customer_type": "B2B", "revenue": 25932820.17, "units": 4592733, "lines": 90855}, {"year_month": "2023-01", "customer_type": "B2C", "revenue": 8039149.66, "units": 1305907, "lines": 163269}, {"year_month": "2023-02", "customer_type": "B2B", "revenue": 24280700.61, "units": 4165319, "lines": 82334}, {"year_month": "2023-02", "customer_type": "B2C", "revenue": 7295618.9, "units": 1194497, "lines": 149442}, {"year_month": "2023-03", "customer_type": "B2B", "revenue": 25912695.53, "units": 4620092, "lines": 91517}, {"year_month": "2023-03", "customer_type": "B2C", "revenue": 7812283.87, "units": 1300798, "lines": 162661}, {"year_month": "2023-04", "customer_type": "B2B", "revenue": 24688884.9, "units": 4347151, "lines": 86351}, {"year_month": "2023-04", "customer_type": "B2C", "revenue": 7673538.01, "units": 1277025, "lines": 159597}, {"year_month": "2023-05", "customer_type": "B2B", "revenue": 25470827.34, "units": 4549847, "lines": 90133}, {"year_month": "2023-05", "customer_type": "B2C", "revenue": 8050040.25, "units": 1316698, "lines": 164566}, {"year_month": "2023-06", "customer_type": "B2B", "revenue": 25368558.83, "units": 4474839, "lines": 88447}, {"year_month": "2023-06", "customer_type": "B2C", "revenue": 7829908.78, "units": 1277671, "lines": 160085}, {"year_month": "2023-07", "customer_type": "B2B", "revenue": 26282210.72, "units": 4621320, "lines": 91209}, {"year_month": "2023-07", "customer_type": "B2C", "revenue": 7976058.14, "units": 1315782, "lines": 164644}, {"year_month": "2023-08", "customer_type": "B2B", "revenue": 26492707.86, "units": 4584626, "lines": 90782}, {"year_month": "2023-08", "customer_type": "B2C", "revenue": 7994589.0, "units": 1311513, "lines": 163853}, {"year_month": "2023-09", "customer_type": "B2B", "revenue": 25299418.36, "units": 4451859, "lines": 88216}, {"year_month": "2023-09", "customer_type": "B2C", "revenue": 7684252.54, "units": 1272331, "lines": 159171}, {"year_month": "2023-10", "customer_type": "B2B", "revenue": 26301759.66, "units": 4601992, "lines": 91232}, {"year_month": "2023-10", "customer_type": "B2C", "revenue": 7909133.03, "units": 1302742, "lines": 163144}, {"year_month": "2023-11", "customer_type": "B2B", "revenue": 25836520.94, "units": 4461997, "lines": 88412}, {"year_month": "2023-11", "customer_type": "B2C", "revenue": 7876338.0, "units": 1274302, "lines": 159270}, {"year_month": "2023-12", "customer_type": "B2B", "revenue": 25960355.81, "units": 4399389, "lines": 87037}, {"year_month": "2023-12", "customer_type": "B2C", "revenue": 7806365.44, "units": 1267761, "lines": 158430}], "discounts": [{"discount_pct": 0.0, "revenue": 275061551.08, "discount_leakage": 0.0, "lines": 5795405, "avg_qty": 8.0, "ci95_qty": 0.0035}, {"discount_pct": 5.0, "revenue": 246116303.72, "discount_leakage": 12953670.5, "lines": 1438899, "avg_qty": 33.93, "ci95_qty": 0.0378}, {"discount_pct": 10.0, "revenue": 492967760.46, "discount_leakage": 54774117.89, "lines": 1384589, "avg_qty": 62.05, "ci95_qty": 0.0426}, {"discount_pct": 15.0, "revenue": 162535548.09, "discount_leakage": 28682774.37, "lines": 381017, "avg_qty": 71.26, "ci95_qty": 0.0811}]};
 
-      for (const b of btn.parentElement.querySelectorAll("button[data-filter]")) {
-        b.setAttribute("aria-pressed", String(b === btn));
+    const fmtUSD = v => "$" + Number(v).toLocaleString("en-US", { maximumFractionDigits: 0 });
+    const fmtNum = v => Number(v).toLocaleString("en-US");
+
+    // Populate static statistical tables
+    document.getElementById("cluster-tbody").innerHTML = DATA.clustering.clusters.map(c => `
+      <tr>
+        <td><strong>${c.persona}</strong></td>
+        <td class="num">${fmtNum(c.customers)}</td>
+        <td class="num good">${fmtUSD(c.mean_revenue)}</td>
+        <td class="num">${c.mean_orders.toFixed(1)}</td>
+        <td class="num">${c.mean_line_qty.toFixed(1)}</td>
+        <td class="num">${c.mean_discount_pct.toFixed(2)}%</td>
+      </tr>
+    `).join("");
+
+    document.getElementById("discount-tbody").innerHTML = DATA.discounts.map(d => `
+      <tr>
+        <td><strong>${d.discount_pct.toFixed(0)}% Tier</strong></td>
+        <td class="num">${fmtNum(d.lines)}</td>
+        <td class="num">${d.avg_qty.toFixed(2)} &plusmn; ${d.ci95_qty.toFixed(3)}</td>
+        <td class="num good">${fmtUSD(d.revenue)}</td>
+        <td class="num ${d.discount_leakage > 25000000 ? 'bad' : 'warn'}">${fmtUSD(d.discount_leakage)}</td>
+      </tr>
+    `).join("");
+
+    let prodGridApi = null;
+    let regGridApi = null;
+
+    function initGrids() {
+      if (typeof agGrid === "undefined") return;
+
+      const prodCols = [
+        { field: "product", headerName: "Product / Brand", flex: 1.3, minWidth: 145, filter: true },
+        { field: "category", headerName: "Category", flex: 1.1, minWidth: 130, filter: true },
+        { field: "customer_type", headerName: "Channel", width: 95, filter: true },
+        { field: "revenue", headerName: "Net Revenue", width: 135, type: "rightAligned", valueFormatter: p => fmtUSD(p.value), sort: "desc" },
+        { field: "discount_leakage", headerName: "Disc. Leakage", width: 130, type: "rightAligned", valueFormatter: p => fmtUSD(p.value) },
+        { field: "units", headerName: "Units Sold", width: 120, type: "rightAligned", valueFormatter: p => fmtNum(p.value) },
+        { field: "avg_unit_price", headerName: "Avg Price", width: 105, type: "rightAligned", valueFormatter: p => "$" + Number(p.value).toFixed(2) },
+        { field: "avg_discount_pct", headerName: "Avg Disc %", width: 105, type: "rightAligned", valueFormatter: p => Number(p.value).toFixed(2) + "%" }
+      ];
+
+      const regCols = [
+        { field: "region", headerName: "German State", flex: 1.4, minWidth: 155, filter: true },
+        { field: "customer_type", headerName: "Channel", width: 95, filter: true },
+        { field: "revenue", headerName: "Net Revenue", width: 135, type: "rightAligned", valueFormatter: p => fmtUSD(p.value), sort: "desc" },
+        { field: "discount_leakage", headerName: "Disc. Leakage", width: 130, type: "rightAligned", valueFormatter: p => fmtUSD(p.value) },
+        { field: "units", headerName: "Units Sold", width: 120, type: "rightAligned", valueFormatter: p => fmtNum(p.value) },
+        { field: "orders", headerName: "Orders", width: 110, type: "rightAligned", valueFormatter: p => fmtNum(p.value) }
+      ];
+
+      prodGridApi = agGrid.createGrid(document.getElementById("product-grid"), {
+        columnDefs: prodCols,
+        rowData: DATA.products,
+        defaultColDef: { sortable: true, resizable: true },
+        animateRows: true
+      });
+
+      regGridApi = agGrid.createGrid(document.getElementById("region-grid"), {
+        columnDefs: regCols,
+        rowData: DATA.regions,
+        defaultColDef: { sortable: true, resizable: true },
+        animateRows: true
+      });
+    }
+
+    function updateDashboard() {
+      const ch = document.getElementById("channel-filter").value;
+      const cat = document.getElementById("category-filter").value;
+      const q = document.getElementById("quick-search").value.trim().toLowerCase();
+
+      const prods = DATA.products.filter(p =>
+        (ch === "ALL" || p.customer_type === ch) &&
+        (cat === "ALL" || p.category === cat) &&
+        (!q || `${p.product} ${p.category} ${p.customer_type}`.toLowerCase().includes(q))
+      );
+
+      const regs = DATA.regions.filter(r =>
+        (ch === "ALL" || r.customer_type === ch) &&
+        (!q || `${r.region} ${r.customer_type}`.toLowerCase().includes(q))
+      );
+
+      const rev = prods.reduce((s, r) => s + r.revenue, 0);
+      const gross = prods.reduce((s, r) => s + r.gross, 0);
+      const leak = prods.reduce((s, r) => s + r.discount_leakage, 0);
+      const units = prods.reduce((s, r) => s + r.units, 0);
+      const lines = prods.reduce((s, r) => s + r.lines, 0);
+      const leakPct = gross > 0 ? (leak / gross) * 100 : 0;
+
+      document.getElementById("kpi-strip").innerHTML = [
+        { label: "Net Realized Revenue", val: fmtUSD(rev), delta: `Gross: ${fmtUSD(gross)}`, cls: "good" },
+        { label: "Promotional Margin Leakage", val: fmtUSD(leak), delta: `${leakPct.toFixed(2)}% of gross revenue`, cls: leakPct > 6 ? "bad" : "warn" },
+        { label: "Total Units Sold", val: fmtNum(units), delta: `${(units / Math.max(1, lines)).toFixed(1)} avg units / line`, cls: "" },
+        { label: "Order Lines Analyzed", val: fmtNum(lines), delta: `${prods.length} product-channel slices`, cls: "" },
+        { label: "Avg Revenue / Order Line", val: "$" + (rev / Math.max(1, lines)).toFixed(2), delta: "Across 16 German states", cls: "good" }
+      ].map(k => `
+        <article class="kpi-card">
+          <span class="kpi-label">${k.label}</span>
+          <strong class="kpi-value ${k.cls}">${k.val}</strong>
+          <span class="kpi-delta ${k.cls}">${k.delta}</span>
+        </article>
+      `).join("");
+
+      document.getElementById("prod-count-badge").textContent = `${prods.length} rows`;
+      document.getElementById("reg-count-badge").textContent = `${regs.length} rows`;
+
+      if (prodGridApi) {
+        prodGridApi.setGridOption("rowData", prods);
+        regGridApi.setGridOption("rowData", regs);
+      } else {
+        // Offline fallback table if CDN is blocked
+        document.getElementById("product-grid").style.overflowY = "auto";
+        document.getElementById("product-grid").innerHTML = `<table><thead><tr><th>Product</th><th>Category</th><th>Channel</th><th class="num">Revenue</th><th class="num">Units</th></tr></thead><tbody>` +
+          prods.slice(0, 30).map(p => `<tr><td>${p.product}</td><td>${p.category}</td><td>${p.customer_type}</td><td class="num">${fmtUSD(p.revenue)}</td><td class="num">${fmtNum(p.units)}</td></tr>`).join("") +
+          `</tbody></table>`;
+        document.getElementById("region-grid").style.overflowY = "auto";
+        document.getElementById("region-grid").innerHTML = `<table><thead><tr><th>Region</th><th>Channel</th><th class="num">Revenue</th><th class="num">Leakage</th></tr></thead><tbody>` +
+          regs.map(r => `<tr><td>${r.region}</td><td>${r.customer_type}</td><td class="num">${fmtUSD(r.revenue)}</td><td class="num">${fmtUSD(r.discount_leakage)}</td></tr>`).join("") +
+          `</tbody></table>`;
       }
-      for (const card of document.querySelectorAll(".case-card[data-category]")) {
-        card.hidden = filter !== "all" && card.dataset.category !== filter;
+    }
+
+    document.getElementById("channel-filter").addEventListener("change", updateDashboard);
+    document.getElementById("category-filter").addEventListener("change", updateDashboard);
+    document.getElementById("quick-search").addEventListener("input", updateDashboard);
+    document.getElementById("export-btn").addEventListener("click", () => {
+      if (prodGridApi && prodGridApi.exportDataAsCsv) {
+        prodGridApi.exportDataAsCsv({ fileName: "beverage_product_performance.csv" });
       }
     });
+
+    initGrids();
+    updateDashboard();
   </script>
 </body>
 </html>

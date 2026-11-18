@@ -4,10 +4,10 @@
 
 ![Executive Overview Dashboard](images/dashboard_overview_preview.png)
 
-- **Interactive AG Grid Beverage Analytics Dashboard (Live):** [Open Live AG Grid Dashboard](https://saul2703.github.io/beverage-sales-elasticity-and-segmentation/demos/beverage-analytics-dashboard.html) ([source](demos/beverage-analytics-dashboard.html))
-- **Interactive Executive Reset & Merchandising Pack (Live):** [Open Live Reset Pack](https://saul2703.github.io/beverage-sales-elasticity-and-segmentation/demos/executive-reset-pack.html) ([source](demos/executive-reset-pack.html))
-- **Portfolio Landing Page (7 Case Studies):** [Open Live Portfolio](https://saul2703.github.io/beverage-sales-elasticity-and-segmentation/) ([source](index.html))
+- **Interactive AG Grid Beverage Analytics Dashboard (Live):** [Open Live AG Grid Dashboard](https://saul2703.github.io/beverage-sales-elasticity-and-segmentation/) ([source](index.html))
+- **Kaggle Source Dataset (752.7 MB):** [Beverage Sales Dataset by Sebastian Willmann](https://www.kaggle.com/datasets/sebastianwillmann/beverage-sales/data)
 - **Reproducible Analysis & Matplotlib Pipeline:** [`src/beverage_analysis.py`](src/beverage_analysis.py)
+- **Aggregated Dataset Summary JSON:** [`data/beverage_summary.json`](data/beverage_summary.json)
 
 ---
 
@@ -40,9 +40,9 @@ Leadership and commercial operations need data-backed answers to five core quest
 
 ## 2. Dataset & Schema (8,999,910 Rows)
 
-This case study analyzes the **Synthetic Beverage Sales Dataset** from Kaggle (`synthetic_beverage_sales_data.csv`, **752.7 MB**, covering **January 1, 2021 – December 30, 2023**).
+This case study analyzes the [**Beverage Sales Dataset** on Kaggle (`sebastianwillmann/beverage-sales`)](https://www.kaggle.com/datasets/sebastianwillmann/beverage-sales/data) (`synthetic_beverage_sales_data.csv`, **752.7 MB**, covering **January 1, 2021 – December 30, 2023**).
 
-> **Note on Git File Size Limits:** Because `synthetic_beverage_sales_data.csv` is **752.7 MB** (exceeding GitHub's 100 MB file limit), it is excluded via `.gitignore`. Place the CSV in the repository root and run `python src/beverage_analysis.py` to regenerate all charts and [`data/beverage_summary.json`](data/beverage_summary.json) in ~22 seconds.
+> **Note on Git File Size Limits:** Because `synthetic_beverage_sales_data.csv` is **752.7 MB** (exceeding GitHub's 100 MB file limit), it is excluded via `.gitignore`. Download the CSV from [Kaggle](https://www.kaggle.com/datasets/sebastianwillmann/beverage-sales/data), place it in the repository root, and run `python src/beverage_analysis.py` to regenerate all charts and [`data/beverage_summary.json`](data/beverage_summary.json) in ~22 seconds.
 
 | Column | Type | Description | Validation Result |
 | :--- | :--- | :--- | :--- |
@@ -164,7 +164,7 @@ Principal Component Analysis (SVD) confirms that the first two principal compone
 
 ## 6. Interactive AG Grid HTML5 Dashboard
 
-Open [`demos/beverage-analytics-dashboard.html`](demos/beverage-analytics-dashboard.html) in any browser to explore the full dataset interactively:
+Open [`index.html`](index.html) (or the live GitHub Pages site at `https://saul2703.github.io/beverage-sales-elasticity-and-segmentation/`) in any browser to explore the full dataset interactively:
 - **Dual AG Grid Community Tables:** Instant sorting, column resizing, and filtering across all **94 Product $\times$ Channel slices** and **32 German State $\times$ Channel slices**.
 - **Dynamic KPI Strip:** Real-time calculation of Net Revenue, Promotional Margin Leakage, Units Sold, and Average Line Value as you toggle between `B2B`, `B2C`, and beverage categories.
 - **One-Click CSV Export:** Export filtered product views directly from AG Grid.
@@ -205,10 +205,7 @@ Open [`demos/beverage-analytics-dashboard.html`](demos/beverage-analytics-dashbo
 ## 10. Repository Structure & How to Run
 
 ```text
-Github Repo - Saul Avalos/
-├── demos/
-│   ├── beverage-analytics-dashboard.html   # Interactive AG Grid + Matplotlib Dashboard (9M-row case study)
-│   └── executive-reset-pack.html           # Interactive HTML5 Executive Reset & Merchandising Pack
+beverage-sales-elasticity-and-segmentation/
 ├── images/
 │   ├── dashboard_overview_preview.png      # 4-panel executive summary hero banner
 │   ├── regional_revenue_b2b_b2c.png        # 16 German states B2B vs B2C revenue chart
@@ -221,9 +218,9 @@ Github Repo - Saul Avalos/
 │   └── beverage_summary.json               # Aggregated metrics & cluster centroids from 8,999,910 rows
 ├── src/
 │   └── beverage_analysis.py                # Reproducible streaming analysis, K-Means++, and Matplotlib script
-├── index.html                              # Main Portfolio Landing Page (7 Case Studies)
-├── verify.mjs                              # Automated integrity, accessibility & sanitization verification
-├── .gitignore                              # Excludes 752.7 MB raw CSV and private notes
+├── index.html                              # Interactive AG Grid + Matplotlib Beverage Analytics Dashboard
+├── verify.mjs                              # Automated HTML5, chart & data integrity verification
+├── .gitignore                              # Excludes 752.7 MB raw CSV
 └── README.md                               # Full Data Science & Analytics Case Study Write-Up
 ```
 
