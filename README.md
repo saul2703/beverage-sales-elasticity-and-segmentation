@@ -1,40 +1,42 @@
-# German Beverage Sales, Price Elasticity & Customer Segmentation (8.99M Rows | Python, SQL, K-Means & AG Grid)
+# German Beverage Sales, Price Elasticity & K-Means++ Segmentation (`8.99M` Rows | Python, AG Grid)
 
-> **End-to-end Data Science & Management Reporting Case Study:** Streaming exploratory data analysis, statistical discount elasticity testing, unsupervised K-Means++ customer segmentation, and an interactive **AG Grid HTML5 Dashboard** across **8,999,910 transactions** (**3,000,000 orders**, **10,000 customers**, **$1.18B net revenue** across **16 German states**).
+> **Language:** **English** | [Español (`README.es.md`)](README.es.md)
+>
+> **End-to-End Quantitative & Machine Learning Analysis:** Streaming chunked aggregation, 95% confidence-interval discount elasticity estimation, unsupervised **K-Means++** customer clustering, **2D SVD PCA**, and a bilingual (**EN / ES**) **AG Grid HTML5 Workbench** across **8,999,910 transactions** (**3,000,000 orders**, **10,000 customers**, **$1.18B net revenue** across **16 German states**).
 
-![Executive Overview Dashboard](images/dashboard_overview_preview.png)
+![Analytical Overview Dashboard](images/dashboard_overview_preview.png)
 
-- **Interactive AG Grid Beverage Analytics Dashboard (Live):** [Open Live AG Grid Dashboard](https://saul2703.github.io/beverage-sales-elasticity-and-segmentation/) ([source](index.html))
-- **Kaggle Source Dataset (752.7 MB):** [Beverage Sales Dataset by Sebastian Willmann](https://www.kaggle.com/datasets/sebastianwillmann/beverage-sales/data)
+- **Interactive Bilingual (EN/ES) AG Grid HTML5 Workbench:** [`index.html`](index.html)
+- **Spanish Documentation:** [`README.es.md`](README.es.md)
+- **Kaggle Source Dataset (`752.7 MB`):** [Beverage Sales Dataset by Sebastian Willmann](https://www.kaggle.com/datasets/sebastianwillmann/beverage-sales/data)
 - **Reproducible Analysis & Matplotlib Pipeline:** [`src/beverage_analysis.py`](src/beverage_analysis.py)
 - **Aggregated Dataset Summary JSON:** [`data/beverage_summary.json`](data/beverage_summary.json)
 
 ---
 
 ## Table of Contents
-1. [Business Problem & Objectives](#1-business-problem--objectives)
+1. [Analytical Scope & Research Questions](#1-analytical-scope--research-questions)
 2. [Dataset & Schema (8,999,910 Rows)](#2-dataset--schema-8999910-rows)
-3. [Project Workflow & Methodology](#3-project-workflow--methodology)
+3. [Project Workflow & Analytical Formulas](#3-project-workflow--analytical-formulas)
 4. [Exploratory Data Analysis & Statistical Findings](#4-exploratory-data-analysis--statistical-findings)
-5. [Unsupervised Machine Learning: K-Means Customer Segmentation](#5-unsupervised-machine-learning-k-means-customer-segmentation)
-6. [Interactive AG Grid HTML5 Dashboard](#6-interactive-ag-grid-html5-dashboard)
-7. [Executive Summary](#7-executive-summary)
-8. [Actionable Business Recommendations](#8-actionable-business-recommendations)
-9. [Limitations & Future Improvements](#9-limitations--future-improvements)
-10. [Repository Structure & How to Run](#10-repository-structure--how-to-run)
+5. [Unsupervised Machine Learning: K-Means++ Customer Segmentation](#5-unsupervised-machine-learning-k-means-customer-segmentation)
+6. [Interactive Bilingual AG Grid HTML5 Workbench](#6-interactive-bilingual-ag-grid-html5-workbench)
+7. [Empirical Summary & Elasticity Synthesis](#7-empirical-summary--elasticity-synthesis)
+8. [Key Analytical Takeaways & Methodological Caveats](#8-key-analytical-takeaways--methodological-caveats)
+9. [Repository Structure & Reproducible Verification](#9-repository-structure--reproducible-verification)
 
 ---
 
-## 1. Business Problem & Objectives
+## 1. Analytical Scope & Research Questions
 
-A national beverage distributor operating across **16 German federal states (Bundesländer)** serves both **B2B wholesale accounts** and **B2C retail consumers** across 47 brands in 4 categories (`Alcoholic Beverages`, `Juices`, `Soft Drinks`, and `Water`).
+This empirical study analyzes **8,999,910 synthetic transaction records** across **16 German federal states (*Bundesländer*)**, spanning both **B2B wholesale** and **B2C retail** channels and **47 beverage SKUs** across 4 categories (`Alcoholic Beverages`, `Juices`, `Soft Drinks`, and `Water`).
 
-Leadership and commercial operations need data-backed answers to five core questions:
-1. **Channel & Regional Performance:** Which German states and customer channels drive top-line revenue versus unit volume?
-2. **Product & Category Concentration:** How does revenue concentration compare to physical unit volume across the 47 beverage brands?
-3. **Promotional Discount Elasticity:** The company grants 5%, 10%, and 15% volume discounts to B2B accounts—costing **$96.41M in promotional margin leakage**. Do the 15% discounts generate enough incremental order volume to justify the margin give-away?
-4. **Customer Segmentation (K-Means Clustering):** Can we segment our **10,000 unique customers** into distinct behavioral tiers based on total spend, order frequency, basket size, and discount utilization?
-5. **Self-Service BI:** How can commercial managers drill into all 47 brands and 16 regions with instant sorting, filtering, and CSV export without paid BI seat dependencies?
+Five core statistical and structural questions frame the analysis:
+1. **Channel & Spatial Dispersion:** How do net revenue and physical unit volume diverge across the 16 German states and between `B2B` vs. `B2C` channels?
+2. **Category Value Concentration vs. Unit Parity:** How sharply does monetary revenue concentrate across categories when physical unit quantities are nearly uniform?
+3. **Statistical Discount Price Elasticity:** `B2B` order lines span 5%, 10%, and 15% discount brackets (**$96.41M** gross-to-net difference). Does stepping from 10% to 15% yield proportional order-size expansion with statistical confidence?
+4. **Unsupervised K-Means++ Behavioral Clustering:** Can 4 standardized behavioral features across all **10,000 unique customers** recover coherent behavioral regimes via K-Means++ and 2D SVD PCA?
+5. **Reproducible Client-Side Exploration:** How can analysts inspect all **94 Product × Channel** and **32 State × Channel** slices with live bilingual (**EN/ES**) switching, SVG charts, sorting, and CSV export with zero backend dependencies?
 
 ---
 
@@ -60,7 +62,7 @@ This case study analyzes the [**Beverage Sales Dataset** on Kaggle (`sebastianwi
 
 ---
 
-## 3. Project Workflow & Methodology
+## 3. Project Workflow & Analytical Formulas
 
 ```text
 Stream 752.7 MB CSV in 1.5M-Row Chunks (UTF-8 + Categorical Dtypes)
@@ -77,7 +79,7 @@ Customer Feature Standardization (Z-Score) + K-Means++ (k = 2..8) + WCSS & Silho
       ↓
 2D Principal Component Analysis (SVD) & Matplotlib Chart Generation
       ↓
-Interactive AG Grid HTML5 Dashboard Compilation (demos/beverage-analytics-dashboard.html)
+Bilingual (EN / ES) Interactive AG Grid HTML5 Workbench Compilation (index.html)
 ```
 
 ### Key Analytical & Engineering Formulas
@@ -153,61 +155,51 @@ We evaluated K-Means++ across $k \in \{2, 3, 4, 5, 6, 7, 8\}$ on the 10,000 stan
 
 Principal Component Analysis (SVD) confirms that the first two principal components explain **99.55% of total behavioral variance** (`PC1 = 74.49%`, `PC2 = 25.06%`).
 
-| Cluster Persona | Customers ($n$) | Channel Mix | Mean Total Revenue | Mean Orders | Mean Units / Line | Mean Discount | Strategic Action |
+| Cluster Persona | Customers ($n$) | Channel Mix | Mean Total Revenue | Mean Orders | Mean Units / Line | Mean Discount | Dominant Behavioral Axis |
 | :--- | ---: | :--- | ---: | ---: | ---: | ---: | :--- |
-| **Cluster 1: High-Volume B2B Anchors** | 1,690 (16.9%) | 100% B2B | **$265,186** | 314.5 | 50.52 | 8.35% | Dedicated key-account rebates tied to Alcohol/Spirits mix |
-| **Cluster 2: Growth Wholesale Accounts** | 1,873 (18.7%) | 100% B2B | **$242,101** | 286.9 | 50.52 | 8.35% | Automated reorder triggers to bridge the 27.6-order gap to Cluster 1 |
-| **Cluster 3: High-Value Retail Enthusiasts** | 3,280 (32.8%) | 100% B2C | **$44,702** | 313.5 | 8.00 | 0.00% | VIP Champagne/Wine bundle subscriptions (zero discounting needed) |
-| **Cluster 4: Standard B2C Consumers** | 3,157 (31.6%) | 100% B2C | **$40,683** | 286.0 | 8.00 | 0.00% | Multi-pack beverage cross-sell at checkout |
+| **Cluster 1: High-Volume B2B Anchors** | 1,690 (16.9%) | 100% B2B | **$265,186** | 314.5 | 50.52 | 8.35% | High basket scale + upper-frequency B2B (`PC1+`, `PC2+`) |
+| **Cluster 2: Growth Wholesale Accounts** | 1,873 (18.7%) | 100% B2B | **$242,101** | 286.9 | 50.52 | 8.35% | Identical `50.52` basket size, lower order count (`286.9` vs. `314.5`) |
+| **Cluster 3: High-Value Retail Enthusiasts** | 3,280 (32.8%) | 100% B2C | **$44,702** | 313.5 | 8.00 | 0.00% | Zero-discount retail, upper-frequency (`313.5` orders) |
+| **Cluster 4: Standard B2C Consumers** | 3,157 (31.6%) | 100% B2C | **$40,683** | 286.0 | 8.00 | 0.00% | Zero-discount retail baseline (`286.0` orders) |
 
 ---
 
-## 6. Interactive AG Grid HTML5 Dashboard
+## 6. Interactive Bilingual AG Grid HTML5 Workbench
 
-Open [`index.html`](index.html) (or the live GitHub Pages site at `https://saul2703.github.io/beverage-sales-elasticity-and-segmentation/`) in any browser to explore the full dataset interactively:
-- **Dual AG Grid Community Tables:** Instant sorting, column resizing, and filtering across all **94 Product $\times$ Channel slices** and **32 German State $\times$ Channel slices**.
-- **Dynamic KPI Strip:** Real-time calculation of Net Revenue, Promotional Margin Leakage, Units Sold, and Average Line Value as you toggle between `B2B`, `B2C`, and beverage categories.
-- **One-Click CSV Export:** Export filtered product views directly from AG Grid.
-
----
-
-## 7. Executive Summary
-
-- **Scale & Revenue:** Across **8,999,910 order lines** (**3.0M orders**, **10,000 customers**), the distributor generated **$1,176.68M in net revenue** from **$1,273.09M gross revenue**, moving **208.24M beverage units** with an average order value (AOV) of **$392.23**.
-- **Wholesale Dominance:** **B2B accounts represent 35.6% of order lines but generate 76.6% ($901.62M) of total net revenue**, driven by $6.3\times$ larger line quantities (`50.52` vs. `8.00` units).
-- **Category Pareto Asymmetry:** **Alcoholic Beverages drive 77.5% ($911.80M) of net revenue** on 25.0% of unit volume, whereas **Water moves 25.0% of unit volume for only 4.16% ($48.91M) of revenue**.
-- **Promotional Margin Leakage:** B2B discounts consume **$96.41M (9.66% of B2B gross revenue)**, with severe diminishing returns at the 15% discount tier.
+Open [`index.html`](index.html) in any browser—complete with an instant **English / Español (`EN / ES`) switcher**, adaptive light/dark palette, filter-reactive SVG charts, and dual **AG Grid Community** tables:
+- **Live SVG & KPI Filtering:** Filter by Channel (`B2B` / `B2C`), Category, or text search to dynamically recalculate Net Revenue, Discount Differential, Units, and both SVG bar charts (German states & Top 12 brands).
+- **Dual AG Grid Community Tables:** Instant sorting, column resizing, and CSV export across all **94 Product $\times$ Channel slices** and **32 German State $\times$ Channel slices**.
 
 ---
 
-## 8. Actionable Business Recommendations
+## 7. Empirical Summary & Elasticity Synthesis
 
-1. **Restructure the 15% B2B Discount Bracket (Est. +$9.5M to +$14.3M Margin Recovery):**
-   - *Finding:* The 15% discount tier lifts average line quantity by only +14.8% over the 10% tier (`71.26` vs. `62.05` units) while burning **$28.68M** in margin leakage.
-   - *Action:* Raise the 15% discount qualification threshold from ~70 units to **100+ units per line** or require a minimum 30% Alcoholic Beverage basket share to qualify for 15% off.
-2. **Unbundle Freight / Minimum Order Quantities (MOQ) on Water & Soft Drinks in Low-Margin Regions:**
-   - *Finding:* States like **Bremen** ($65.02M revenue on 13.19M units) move heavy physical volume in low-price Water (`$48.91M` total revenue across 52.08M units).
-   - *Action:* Enforce pallet-level MOQs on B2B Water shipments or bundle Water discounts conditionally with high-margin Spirits/Champagne (`Veuve Clicquot`, `Moët & Chandon`, `Johnnie Walker`).
-3. **Frequency Nudges for Cluster 2 Wholesale Accounts (+$43.2M Revenue Opportunity):**
-   - *Finding:* Cluster 2 B2B accounts (`n = 1,873`) have the exact same basket size (`50.52` units/line) as Cluster 1 (`n = 1,690`), trailing only in order frequency (`286.9` vs. `314.5` orders over 36 months).
-   - *Action:* Deploy automated 10-day reorder cadence reminders for Cluster 2 procurement managers to close the 27.6-order gap.
+- **Observed Scale (`2021–2023`):** Across **8,999,910 order lines** (**3.0M orders**, **10,000 customers**), net realized revenue equals **$1,176.68M** against **$1,273.09M gross** across **208.24M physical units** (mean order value `$392.23`).
+- **Channel Asymmetry (`76.6%` B2B Share):** **B2B rows represent 35.6% of order lines yet account for $901.62M (76.6%) of net revenue**, driven by $6.3\times$ larger mean line quantities (`50.52` vs. `8.00` units).
+- **Value vs. Logistics Decoupling:** **Alcoholic Beverages generate 77.5% ($911.80M)** of net revenue on **25.0% of unit volume**, whereas **Water moves 25.0% of unit volume for only 4.16% ($48.91M)** of revenue.
+- **Non-Linear Discount Elasticity:** Discount differential totals **$96.41M (9.66% of B2B gross)**. Stepwise quantity lift drops sharply from **+82.9%** (`5% → 10%`: `33.93 → 62.05` units) down to **+14.8%** (`10% → 15%`: `62.05 → 71.26` units) while incurring **$28.68M** in margin differential at the `15%` tier.
 
 ---
 
-## 9. Limitations & Future Improvements
+## 8. Key Analytical Takeaways & Methodological Caveats
 
-- **Absence of COGS & Freight Cost by SKU:** The dataset records gross price, discount rate, and net revenue, but lacks unit Cost of Goods Sold (COGS) and regional shipping weight costs. Incorporating SKU-level gross margin % would further sharpen the Water vs. Alcoholic Beverages profitability gap.
-- **Synthetic Uniformity Across Non-Price Dimensions:** Because the dataset is synthetically generated, unit volumes across categories (~52M units each) and customer order counts (~300 orders over 3 years) exhibit lower variance than organic retail POS feeds.
-- **Next Steps:** Add survival/churn hazard modeling on inter-order arrival times and integrate live DuckDB/WebAssembly SQL querying into the HTML5 dashboard.
+1. **Regime Decomposition (`99.55%` Variance in 2 PCA Dimensions):**
+   - `PC1` (`74.49%`) captures structural `B2B` vs. `B2C` separation (basket size, discount usage, total revenue), whereas `PC2` (`25.06%`) isolates pure inter-customer purchase frequency (`314` vs. `286` orders across both channels cleanly).
+2. **Diminishing Marginal Returns at Upper Discount Tiers:**
+   - Tightly bounded 95% CIs (`±0.038` to `±0.081` units/line across $N > 381\text{k}$ rows/tier) rule out sampling noise: marginal unit elasticity weakens substantially above the `10%` threshold.
+3. **Methodological Caveats & Data Constraints:**
+   - **Absence of SKU-Level COGS & Freight Cost:** The Kaggle dataset includes unit gross price, discount rate, and realized revenue, omitting unit cost and shipping mass; monetary figures measure **revenue and discount differential**, not net accounting profit.
+   - **Synthetic Generating Process:** Each beverage category sits near ~52.0M units and each customer averages ~300 orders over 36 months, creating clean statistical separation (`Silhouette = 0.5384`) with artificially low dispersion relative to organic retail POS feeds.
+   - **Cross-Sectional Association:** Observed tier quantities reflect observational order assignments rather than randomized A/B discount allocation.
 
 ---
 
-## 10. Repository Structure & How to Run
+## 9. Repository Structure & Reproducible Verification
 
 ```text
 beverage-sales-elasticity-and-segmentation/
 ├── images/
-│   ├── dashboard_overview_preview.png      # 4-panel executive summary hero banner
+│   ├── dashboard_overview_preview.png      # 4-panel analytical overview banner
 │   ├── regional_revenue_b2b_b2c.png        # 16 German states B2B vs B2C revenue chart
 │   ├── category_product_performance.png    # Category mix & Top 12 brands chart
 │   ├── monthly_sales_trend.png             # 36-month time-series revenue trend
@@ -218,24 +210,27 @@ beverage-sales-elasticity-and-segmentation/
 │   └── beverage_summary.json               # Aggregated metrics & cluster centroids from 8,999,910 rows
 ├── src/
 │   └── beverage_analysis.py                # Reproducible streaming analysis, K-Means++, and Matplotlib script
-├── index.html                              # Interactive AG Grid + Matplotlib Beverage Analytics Dashboard
-├── verify.mjs                              # Automated HTML5, chart & data integrity verification
+├── index.html                              # Bilingual (EN/ES) Interactive AG Grid & SVG Dashboard
+├── verify.mjs                              # Automated HTML5, bilingual, SVG & data integrity verification
 ├── .gitignore                              # Excludes 752.7 MB raw CSV
-└── README.md                               # Full Data Science & Analytics Case Study Write-Up
+├── README.md                               # English Analytical Documentation
+└── README.es.md                            # Documentación Analítica en Español
 ```
 
-### Run the Analysis & Verification
+### Run the Analysis, Verification & Publish Publicly to GitHub
 
 ```powershell
 # 1. Re-run the 8.99M-row streaming analysis & regenerate all Matplotlib charts (~22s)
 uv run --with pandas --with numpy --with matplotlib python src/beverage_analysis.py
 
-# 2. Run the automated HTML5, accessibility, and sanitization test suite
+# 2. Run the automated HTML5, bilingual, SVG, and data integrity test suite
 node verify.mjs
 
-# 3. Initialize and push to a private GitHub repository (excludes the 752.7 MB CSV via .gitignore)
+# 3. Publish as a standalone PUBLIC GitHub repository (excludes the 752.7 MB CSV via .gitignore)
+winget install --id Git.Git -e; winget install --id GitHub.cli -e
 git init
 git add .
-git commit -m "Add 8.99M-row German Beverage Sales case study, Matplotlib charts, and AG Grid dashboard"
-gh repo create ai-ml-portfolio --private --source=. --remote=origin --push
+git commit -m "Add 8.99M-row German Beverage Sales analytical study, bilingual EN/ES dashboard & K-Means++"
+gh auth login
+gh repo create beverage-sales-elasticity-and-segmentation --public --description "Streaming EDA, 95% CI discount elasticity & K-Means++ segmentation across 8.99M beverage transactions with bilingual EN/ES AG Grid workbench." --source=. --remote=origin --push
 ```
