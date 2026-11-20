@@ -2,11 +2,11 @@
 
 > **Idioma:** [English (`README.md`)](README.md) | **Español**
 >
-> **Análisis Cuantitativo y de Machine Learning de Extremo a Extremo:** Agregación por bloques (*streaming*), estimación estadística de elasticidad de descuentos con intervalos de confianza al 95%, agrupamiento no supervisado **K-Means++**, **PCA 2D (SVD)** y tablero interactivo bilingüe (**EN / ES**) en **AG Grid HTML5** sobre **8,999,910 transacciones** (**3,000,000 pedidos**, **10,000 clientes**, **$1.18B de ingresos netos** en **16 estados federados de Alemania**).
+> **Análisis Cuantitativo y de Machine Learning de Extremo a Extremo:** Agregación por bloques (*streaming*), estimación estadística de elasticidad de descuentos con intervalos de confianza al 95%, agrupamiento no supervisado **K-Means++**, **PCA 2D (SVD)** y dashboard interactivo bilingüe (**EN / ES**) en **AG Grid HTML5** sobre **8,999,910 transacciones** (**3,000,000 pedidos**, **10,000 clientes**, **$1.18B de ingresos netos** en **16 estados federados de Alemania**).
 
 ![Panel Analítico General](images/dashboard_overview_preview.png)
 
-- **Tablero Interactivo Bilingüe (EN/ES) en AG Grid HTML5:** [`index.html`](index.html)
+- **Dashboard Interactivo Bilingüe (EN/ES) en AG Grid HTML5:** [`index.html`](index.html)
 - **Documentación en Inglés:** [`README.md`](README.md)
 - **Fuente Oficial de Datos Kaggle (`752.7 MB`):** [Beverage Sales Dataset por Sebastian Willmann](https://www.kaggle.com/datasets/sebastianwillmann/beverage-sales/data)
 - **Pipeline Reproducible en Python y Matplotlib:** [`src/beverage_analysis.py`](src/beverage_analysis.py)
@@ -20,7 +20,7 @@
 3. [Flujo de Trabajo y Fórmulas Analíticas](#3-flujo-de-trabajo-y-fórmulas-analíticas)
 4. [Análisis Exploratorio y Hallazgos Estadísticos](#4-análisis-exploratorio-y-hallazgos-estadísticos)
 5. [Aprendizaje No Supervisado: Segmentación de Clientes K-Means++](#5-aprendizaje-no-supervisado-segmentación-de-clientes-k-means)
-6. [Tablero Interactivo Bilingüe en AG Grid HTML5](#6-tablero-interactivo-bilingüe-en-ag-grid-html5)
+6. [Dashboard Interactivo Bilingüe en AG Grid HTML5](#6-dashboard-interactivo-bilingüe-en-ag-grid-html5)
 7. [Síntesis Empírica y Elasticidad de Descuentos](#7-síntesis-empírica-y-elasticidad-de-descuentos)
 8. [Conclusiones Analíticas Clave y Limitaciones Metodológicas](#8-conclusiones-analíticas-clave-y-limitaciones-metodológicas)
 9. [Estructura del Repositorio y Verificación Reproducible](#9-estructura-del-repositorio-y-verificación-reproducible)
@@ -110,7 +110,7 @@ Los dos primeros componentes principales explican **99.55% de la varianza conduc
 
 ---
 
-## 6. Tablero Interactivo Bilingüe en AG Grid HTML5
+## 6. Dashboard Interactivo Bilingüe en AG Grid HTML5
 
 Abre [`index.html`](index.html) en cualquier navegador para explorar el panel con cambio instantáneo **Inglés / Español (`EN / ES`)**, gráficos SVG reactivos a filtros y tablas **AG Grid Community** (`94` filas Producto × Canal y `32` filas Estado × Canal).
 
