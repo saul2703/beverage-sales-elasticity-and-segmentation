@@ -921,23 +921,50 @@
       ];
     }
 
+    function getGridTheme() {
+      const isDark = (document.documentElement.getAttribute("data-theme") || "light") === "dark";
+      if (typeof agGrid === "undefined" || !agGrid.themeQuartz) return undefined;
+      let t = agGrid.themeQuartz;
+      if (isDark && agGrid.colorSchemeDark) {
+        t = t.withPart(agGrid.colorSchemeDark);
+      }
+      return t.withParams({
+        backgroundColor: isDark ? "#151d28" : "#ffffff",
+        foregroundColor: isDark ? "#f1f5f9" : "#0f172a",
+        headerBackgroundColor: isDark ? "#111822" : "#f4f6f9",
+        headerTextColor: isDark ? "#f1f5f9" : "#0f172a",
+        oddRowBackgroundColor: isDark ? "#111822" : "#f4f6f9",
+        borderColor: isDark ? "#273344" : "#d8e0ea",
+        chromeBackgroundColor: isDark ? "#111822" : "#f4f6f9"
+      });
+    }
+
     function syncGridTheme() {
       const isDark = (document.documentElement.getAttribute("data-theme") || "light") === "dark";
+      document.documentElement.setAttribute("data-ag-theme-mode", isDark ? "dark" : "light");
       const cls = isDark ? "grid-box ag-theme-quartz-dark" : "grid-box ag-theme-quartz";
       document.getElementById("product-grid").className = cls;
       document.getElementById("region-grid").className = cls;
+      const t = getGridTheme();
+      if (t) {
+        if (prodGridApi && prodGridApi.setGridOption) prodGridApi.setGridOption("theme", t);
+        if (regGridApi && regGridApi.setGridOption) regGridApi.setGridOption("theme", t);
+      }
     }
 
     function initGrids() {
       syncGridTheme();
       if (typeof agGrid === "undefined") return;
+      const gridTheme = getGridTheme();
       prodGridApi = agGrid.createGrid(document.getElementById("product-grid"), {
+        theme: gridTheme,
         columnDefs: getProdCols(),
         rowData: DATA.products,
         defaultColDef: { sortable: true, resizable: true },
         animateRows: true
       });
       regGridApi = agGrid.createGrid(document.getElementById("region-grid"), {
+        theme: gridTheme,
         columnDefs: getRegCols(),
         rowData: DATA.regions,
         defaultColDef: { sortable: true, resizable: true },
