@@ -922,7 +922,7 @@
     }
 
     function syncGridTheme() {
-      const isDark = typeof window.matchMedia === "function" && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const isDark = (document.documentElement.getAttribute("data-theme") || "light") === "dark";
       const cls = isDark ? "grid-box ag-theme-quartz-dark" : "grid-box ag-theme-quartz";
       document.getElementById("product-grid").className = cls;
       document.getElementById("region-grid").className = cls;
@@ -1093,6 +1093,7 @@
       document.documentElement.setAttribute("data-theme", next);
       try { localStorage.setItem("sa_theme", next); } catch (e) {}
       syncThemeBtn();
+      syncGridTheme();
     });
     document.getElementById("btnLangToggle").addEventListener("click", () => {
       lang = lang === "en" ? "es" : "en";
